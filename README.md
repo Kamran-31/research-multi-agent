@@ -18,19 +18,7 @@ The system uses seven agents:
 
 ## Architecture
 
-User
-↓
-Research Planner
-↓
-Web Researcher + Academic Researcher + Industry Researcher
-↓
-Evidence Analyst
-↓
-Fact Checker
-↓
-Research Synthesizer
-↓
-Final Research Report
+User -> Research Planner -> Web Researcher + Academic Researcher + Industry Researcher -> Evidence Analyst -> Fact Checker -> Research Synthesizer -> Final Research Report
 
 ## Tools
 
