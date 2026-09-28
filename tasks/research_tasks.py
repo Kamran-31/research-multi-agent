@@ -10,62 +10,60 @@ def create_tasks(
 
     planner = Task(
         description=f"""
-Create a research plan for:
+Create a concise research plan for this question:
 
 {question}
 
-Research depth:
-{depth}
+Research depth: {depth}
 
-Target search results:
-{max_results}
+Identify:
 
-Produce:
+1. The main research objective.
+2. Four focused subquestions.
+3. What evidence is needed.
+4. Preferred source types.
 
-1. Central research objective
-2. Four to seven focused subquestions
-3. Evidence required for each subquestion
-4. Preferred source types
-5. Important terms, entities and comparisons to investigate
-
-Do not answer the research question yet.
-Create the investigation plan only.
+Keep the plan concise.
+Do not answer the question yet.
 """,
         expected_output=(
-            "A structured research plan containing the objective, "
-            "subquestions, evidence requirements and source priorities."
+            "A concise research plan with one objective, "
+            "four subquestions and evidence requirements."
         ),
         agent=agents["planner"],
     )
 
     web = Task(
         description=f"""
-Using the planner's research plan, conduct web research for:
+Research this question using the planner's guidance:
 
 {question}
 
-Find current and authoritative web evidence.
+Find current web evidence.
 
 Prioritize:
 - official sources
-- primary sources
 - government or institutional sources
+- primary sources
 - reputable reporting
-- recent documentation
 
-For every important finding provide:
+Return ONLY the most useful findings.
 
-Claim:
+For each finding provide:
+
+Finding:
 Evidence:
 Source:
 URL:
-Why it matters:
 
-Do not fabricate sources.
+Maximum useful findings: {max_results}
+
+Do not write a long report.
+Do not invent sources.
 """,
         expected_output=(
-            "A source-grounded web research dossier containing claims, "
-            "evidence and URLs."
+            "A concise web evidence dossier containing "
+            "key findings and source URLs."
         ),
         agent=agents["web_researcher"],
         context=[planner],
@@ -73,26 +71,30 @@ Do not fabricate sources.
 
     academic = Task(
         description=f"""
-Using the planner's research plan, conduct academic research for:
+Research this question using scholarly literature:
 
 {question}
 
-Search scholarly literature and technical studies.
+Find relevant academic evidence.
 
-For important works provide:
+For each important work provide:
 
 Finding:
-Paper title:
-Publication year:
-DOI or URL:
-Why it matters:
-Limitations:
+Paper:
+Year:
+URL or DOI:
+Limitation:
 
-Prefer relevant and recent literature while retaining foundational research where useful.
+Return only the most relevant works.
+
+Maximum works: {max_results}
+
+Do not write a long literature review.
+Do not invent papers.
 """,
         expected_output=(
-            "An academic evidence dossier with bibliographic references "
-            "and research findings."
+            "A concise academic evidence dossier with "
+            "relevant papers, findings and URLs."
         ),
         agent=agents["academic_researcher"],
         context=[planner],
@@ -100,30 +102,34 @@ Prefer relevant and recent literature while retaining foundational research wher
 
     industry = Task(
         description=f"""
-Using the planner's research plan, conduct industry research for:
+Investigate the industry side of this question:
 
 {question}
 
-Investigate:
+Look for:
+
 - companies
 - products
 - deployments
-- market developments
 - adoption
-- practical implementations
-
-Separate company claims from independently supported facts.
+- real-world implementations
+- industry reports
 
 For each important finding provide:
 
-Claim:
+Finding:
 Evidence:
 Organization/source:
 URL:
-Relevance:
+
+Maximum useful findings: {max_results}
+
+Clearly distinguish company claims from independently supported evidence.
+Keep the response concise.
 """,
         expected_output=(
-            "An industry evidence dossier with claims, evidence and URLs."
+            "A concise industry evidence dossier "
+            "with findings and source URLs."
         ),
         agent=agents["industry_researcher"],
         context=[planner],
@@ -131,25 +137,26 @@ Relevance:
 
     evidence = Task(
         description="""
-Analyze the web, academic and industry research dossiers.
+Analyze the three research dossiers.
 
-Create an evidence map.
+Create a compact evidence map.
 
 For each major claim identify:
 
-- Claim
-- Supporting evidence
-- Sources
-- Source quality
-- Agreement between sources
-- Contradictions
-- Evidence gaps
+Claim:
+Supporting evidence:
+Sources:
+Agreement or contradiction:
+Evidence strength:
+Gap or limitation:
 
-Do not introduce facts that were not found by the researchers.
+Do not introduce new facts.
+Do not write a final report.
+Keep the evidence map concise.
 """,
         expected_output=(
-            "A structured evidence map containing claims, evidence, "
-            "source quality, contradictions and gaps."
+            "A compact evidence map containing major claims, "
+            "supporting sources, contradictions and gaps."
         ),
         agent=agents["evidence_analyst"],
         context=[web, academic, industry],
@@ -157,37 +164,37 @@ Do not introduce facts that were not found by the researchers.
 
     fact_check = Task(
         description="""
-Fact-check the evidence map.
+Fact-check the most important claims in the evidence map.
 
-Focus particularly on:
+Prioritize:
 
+- statistics
 - numerical claims
 - dates
 - company/product claims
-- important conclusions
-- conflicting evidence
+- controversial findings
 
-Use web search and webpage extraction where appropriate.
+Use web research only where verification is necessary.
 
-For each checked claim report:
+For each checked claim provide:
 
 Claim:
-Verification status:
-Verification evidence:
+Status:
+Evidence:
 Source URL:
-Explanation:
 
-Allowed statuses:
+Use only:
 
 Confirmed
 Partially supported
 Conflicting
 Unverified
 
-Do not classify weak evidence as confirmed.
+Keep the fact-check concise.
 """,
         expected_output=(
-            "A fact-check dossier with verification statuses and source URLs."
+            "A concise fact-check dossier with verification "
+            "statuses and source URLs."
         ),
         agent=agents["fact_checker"],
         context=[evidence],
@@ -199,17 +206,17 @@ Write the final research report for:
 
 {question}
 
-Use only the evidence map and fact-check dossier.
+Use only the evidence map and fact-check results.
 
 Structure:
 
 # Executive Summary
 
-# Research Findings
+# Key Findings
 
 # Evidence Analysis
 
-# Contradictions and Uncertainty
+# Risks and Uncertainty
 
 # Practical Implications
 
@@ -220,18 +227,19 @@ Structure:
 Rules:
 
 - Do not invent facts.
-- Do not invent sources.
 - Do not invent statistics.
+- Do not invent sources.
 - Do not invent quotations.
 - Do not present unverified claims as facts.
 - Attribute company claims.
-- Preserve important disagreements.
-- Clearly communicate uncertainty.
+- Preserve important contradictions.
 - Include source URLs.
+
+Keep the report informative but concise.
 """,
         expected_output=(
-            "A polished, source-grounded research report with a complete "
-            "Sources section."
+            "A concise, polished research report with "
+            "source URLs and clearly stated uncertainty."
         ),
         agent=agents["synthesizer"],
         context=[evidence, fact_check],
