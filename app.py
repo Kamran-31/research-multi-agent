@@ -977,6 +977,31 @@ st.html(
         line-height: 1.7;
     }
 
+    div[data-testid="stTextArea"] {
+    width: 100%;
+    }
+
+    div[data-testid="stTextArea"] > div {
+        border: 1px solid rgba(45, 125, 255, 0.4) !important;
+        border-radius: 16px !important;
+        background: #0D141F !important;
+        overflow: hidden !important;
+    }
+
+    div[data-testid="stTextArea"] textarea {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 16px !important;
+        color: #E8EEF7 !important;
+        box-shadow: none !important;
+    }
+
+    div[data-testid="stTextArea"] textarea:focus {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
     </style>
     """
 )
@@ -1219,29 +1244,15 @@ st.html(
     """
 )
 
-st.html(
-    """
-    <div class="input-shell">
-        <div class="input-inner">
-    """
-)
-
 question = st.text_area(
     "Research question",
     placeholder=(
-        "Ask a complex question...\n\n"
+        "Ask a research question...\n\n"
         "Example: What are the major opportunities, risks and "
         "market trends for AI-powered cybersecurity platforms?"
     ),
     height=165,
     label_visibility="collapsed",
-)
-
-st.html(
-    """
-        </div>
-    </div>
-    """
 )
 
 
