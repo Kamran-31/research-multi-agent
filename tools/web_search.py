@@ -55,7 +55,7 @@ SOURCE {index}
 Title: {title}
 URL: {url}
 Evidence:
-{content[:1200]}
+{content[:800]}
 """
             )
 
