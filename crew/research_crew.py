@@ -1,19 +1,8 @@
 import os
-import time
-import re
 
-from crewai import Crew, Process
+from crewai import Agent, Crew, Process, Task
 
-from agents.planner import create_planner
-from agents.web_researcher import create_web_researcher
-from agents.academic_researcher import create_academic_researcher
-from agents.industry_researcher import create_industry_researcher
-from agents.evidence_analyst import create_evidence_analyst
-from agents.fact_checker import create_fact_checker
-from agents.synthesizer import create_synthesizer
-
-from tasks.research_tasks import create_tasks
-
+from config.llm import get_llm
 from tools.web_search import web_search_tool
 from tools.academic_search import academic_search_tool
 
@@ -22,139 +11,140 @@ class ResearchCrew:
 
     def __init__(self):
 
-        self.agents = {
-            "planner": create_planner(),
-            "web_researcher": create_web_researcher(),
-            "academic_researcher": create_academic_researcher(),
-            "industry_researcher": create_industry_researcher(),
-            "evidence_analyst": create_evidence_analyst(),
-            "fact_checker": create_fact_checker(),
-            "synthesizer": create_synthesizer(),
-        }
+        self.agent = Agent(
+            role="Research Intelligence Analyst",
+            goal=(
+                "Analyze multi-source research evidence and produce "
+                "a concise, accurate, evidence-based research report."
+            ),
+            backstory=(
+                "You are a senior research intelligence analyst. "
+                "You evaluate web, academic and industry evidence, "
+                "identify important findings, contradictions and "
+                "uncertainties, then produce a professional report."
+            ),
+            llm=get_llm(),
+            allow_delegation=False,
+            max_iter=1,
+            verbose=False,
+        )
 
     def get_limit(self, depth):
 
         return {
             "Quick": 2,
-            "Standard": 2,
-            "Deep": 3,
+            "Standard": 3,
+            "Deep": 4,
         }.get(depth, 2)
-
-    def search_web(self, query, limit):
-
-        os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
-
-        result = web_search_tool.run(query)
-
-        return str(result)[:3500]
-
-    def search_academic(self, query, limit):
-
-        os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
-
-        result = academic_search_tool.run(query)
-
-        return str(result)[:3000]
 
     def run(
         self,
-        question,
-        depth="Standard",
-        max_results=2,
-    ):
-
-        if not os.getenv("GROQ_API_KEY"):
-            raise RuntimeError("GROQ_API_KEY is missing.")
+        question: str,
+        depth: str = "Quick",
+        max_results: int = 2,
+    ) -> str:
 
         limit = self.get_limit(depth)
 
-        # -----------------------------------------
-        # External research happens WITHOUT Groq.
-        # -----------------------------------------
+        os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
 
-        web_evidence = self.search_web(
-            question,
-            limit,
+        # -------------------------------
+        # External research
+        # -------------------------------
+
+        web = str(
+            web_search_tool.run(question)
+        )[:3500]
+
+        academic = str(
+            academic_search_tool.run(question)
+        )[:3000]
+
+        industry_query = (
+            f"{question} companies products "
+            f"industry adoption implementation"
         )
 
-        academic_evidence = self.search_academic(
-            question,
-            limit,
-        )
+        industry = str(
+            web_search_tool.run(industry_query)
+        )[:3000]
 
-        industry_evidence = self.search_web(
-            f"{question} companies products adoption implementation",
-            limit,
-        )
+        # -------------------------------
+        # ONE LLM CALL
+        # -------------------------------
 
-        # -----------------------------------------
-        # Create compact agent tasks.
-        # -----------------------------------------
+        task = Task(
+            description=f"""
+You are producing a research intelligence report.
 
-        tasks = create_tasks(
-            agents=self.agents,
-            question=question,
-            web_evidence=web_evidence,
-            academic_evidence=academic_evidence,
-            industry_evidence=industry_evidence,
+RESEARCH QUESTION:
+{question}
+
+RESEARCH DEPTH:
+{depth}
+
+WEB EVIDENCE:
+{web}
+
+ACADEMIC EVIDENCE:
+{academic}
+
+INDUSTRY EVIDENCE:
+{industry}
+
+Analyze the evidence and produce:
+
+# Executive Summary
+
+# Key Findings
+
+# Evidence Analysis
+
+# Risks and Uncertainty
+
+# Practical Implications
+
+# Conclusion
+
+# Sources
+
+Rules:
+
+1. Use ONLY the supplied evidence.
+2. Do not invent facts.
+3. Do not invent statistics.
+4. Do not invent sources.
+5. Distinguish company claims from independent evidence.
+6. Mention contradictions when present.
+7. Clearly identify uncertainty.
+8. Include source URLs.
+9. Keep the report concise.
+10. Maximum approximately 700 words.
+""",
+            expected_output=(
+                "A concise evidence-based research report "
+                "with source URLs."
+            ),
+            agent=self.agent,
         )
 
         crew = Crew(
-            agents=list(self.agents.values()),
-            tasks=tasks,
+            agents=[self.agent],
+            tasks=[task],
             process=Process.sequential,
             verbose=False,
         )
 
-        # -----------------------------------------
-        # Run with a small number of retries.
-        # -----------------------------------------
+        result = crew.kickoff()
 
-        for attempt in range(2):
+        if hasattr(result, "raw"):
+            output = result.raw
+        else:
+            output = str(result)
 
-            try:
+        if not output or not output.strip():
+            raise RuntimeError(
+                "The research model returned an empty response."
+            )
 
-                result = crew.kickoff()
-
-                if hasattr(result, "raw"):
-                    return result.raw
-
-                return str(result)
-
-            except Exception as exc:
-
-                error = str(exc).lower()
-
-                rate_limit = (
-                    "rate limit" in error
-                    or "ratelimit" in error
-                    or "429" in error
-                    or "tokens per minute" in error
-                )
-
-                if not rate_limit:
-                    raise
-
-                if attempt == 1:
-                    raise RuntimeError(
-                        "Groq's token-per-minute limit was reached. "
-                        "Please wait approximately one minute and "
-                        "run the research again."
-                    ) from exc
-
-                match = re.search(
-                    r"try again in ([0-9.]+)s",
-                    error,
-                )
-
-                wait = (
-                    float(match.group(1)) + 3
-                    if match
-                    else 10
-                )
-
-                time.sleep(wait)
-
-        raise RuntimeError(
-            "Research workflow failed."
-        )
+        return output
