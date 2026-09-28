@@ -1003,10 +1003,13 @@ with st.sidebar:
         '<div class="sidebar-section">Research Configuration</div>'
     )
 
+    if "research_depth" not in st.session_state:
+        st.session_state.research_depth = "Standard"
+
     research_depth = st.selectbox(
         "Research depth",
         ["Quick", "Standard", "Deep"],
-        index=1,
+        key="research_depth",
         label_visibility="collapsed",
     )
 
@@ -1263,7 +1266,7 @@ mode_data = [
     (
         "Standard",
         "Balanced research",
-        "Web, academic and industry relevant evidences.",
+        "Web, academic and industry relevant evidence.",
     ),
     (
         "Deep",
@@ -1272,51 +1275,130 @@ mode_data = [
     ),
 ]
 
-for col, (name, subtitle, description) in zip(mode_cols, mode_data):
 
-    active = name == research_depth
+# ------------------------------------------------------------
+# Dynamic styling for the three clickable mode cards
+# ------------------------------------------------------------
+
+active_index = {
+    "Quick": 1,
+    "Standard": 2,
+    "Deep": 3,
+}[research_depth]
+
+st.html(
+    f"""
+    <style>
+
+    /* Mode card buttons */
+
+    div[data-testid="stHorizontalBlock"] > div:nth-child(1)
+    div[data-testid="stButton"] > button,
+    div[data-testid="stHorizontalBlock"] > div:nth-child(2)
+    div[data-testid="stButton"] > button,
+    div[data-testid="stHorizontalBlock"] > div:nth-child(3)
+    div[data-testid="stButton"] > button {{
+        width: 100% !important;
+        min-height: 116px !important;
+
+        padding: 20px !important;
+
+        border-radius: 14px !important;
+
+        background: #0D141F !important;
+
+        border: 1px solid #1D2938 !important;
+
+        color: #E8EDF5 !important;
+
+        text-align: left !important;
+
+        box-shadow: none !important;
+
+        transition:
+            transform 0.2s ease,
+            border-color 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease !important;
+    }}
+
+
+    /* Hover */
+
+    div[data-testid="stHorizontalBlock"] > div:nth-child(1)
+    div[data-testid="stButton"] > button:hover,
+    div[data-testid="stHorizontalBlock"] > div:nth-child(2)
+    div[data-testid="stButton"] > button:hover,
+    div[data-testid="stHorizontalBlock"] > div:nth-child(3)
+    div[data-testid="stButton"] > button:hover {{
+        transform: translateY(-2px) !important;
+
+        border-color: #2C70C9 !important;
+
+        background: #101A28 !important;
+
+        color: #F1F5F9 !important;
+    }}
+
+
+    /* Active card */
+
+    div[data-testid="stHorizontalBlock"] > div:nth-child({active_index})
+    div[data-testid="stButton"] > button {{
+        border-color: rgba(48,133,255,0.58) !important;
+
+        background:
+            linear-gradient(
+                145deg,
+                rgba(25,75,140,0.24),
+                rgba(13,20,31,0.95)
+            ) !important;
+
+        box-shadow:
+            0 10px 30px rgba(20,100,220,0.08) !important;
+    }}
+
+
+    /* Keep button text clean */
+
+    div[data-testid="stHorizontalBlock"] > div
+    div[data-testid="stButton"] > button p {{
+        margin: 0 !important;
+
+        color: #F1F5F9 !important;
+
+        font-size: 14px !important;
+
+        line-height: 1.55 !important;
+    }}
+
+    </style>
+    """
+)
+
+
+# ------------------------------------------------------------
+# Clickable mode cards
+# ------------------------------------------------------------
+
+for col, (name, subtitle, description) in zip(
+    mode_cols,
+    mode_data,
+):
 
     with col:
 
-        st.html(
-            f"""
-            <div class="mode-card {'active' if active else ''}">
-
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                ">
-
-                    <div>
-
-                        <div class="mode-name">
-                            {name}
-                        </div>
-
-                        <div class="mode-subtitle">
-                            {subtitle}
-                        </div>
-
-                    </div>
-
-                    <div style="
-                        width:9px;
-                        height:9px;
-                        border-radius:50%;
-                        background:{'#4DD9A1' if active else '#273447'};
-                    ">
-                    </div>
-
-                </div>
-
-                <div class="mode-description">
-                    {description}
-                </div>
-
-            </div>
-            """
+        clicked = st.button(
+            f"**{name}**  \n"
+            f"{subtitle}  \n"
+            f"{description}",
+            key=f"mode_{name.lower()}",
+            use_container_width=True,
         )
+
+        if clicked:
+            st.session_state.research_depth = name
+            st.rerun()
 
 
 # ============================================================
