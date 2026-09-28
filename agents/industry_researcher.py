@@ -7,7 +7,7 @@ def create_industry_researcher() -> Agent:
         role="Industry Research Specialist",
         goal="Analyze supplied industry evidence.",
         backstory="You extract real-world industry findings.",
-        llm=get_llm(350),
+        llm=get_llm(600),
         allow_delegation=False,
         max_iter=1,
         verbose=False,
