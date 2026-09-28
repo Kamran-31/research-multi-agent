@@ -1,3 +1,4 @@
+```python
 import os
 import html
 import streamlit as st
@@ -30,967 +31,955 @@ st.set_page_config(
 
 
 # ============================================================
-# PREMIUM UI STYLES
+# PREMIUM UI
 # ============================================================
 
-st.markdown(
+st.html(
     """
-<style>
-
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
-
-/* =========================================================
-   GLOBAL
-   ========================================================= */
-
-html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
-}
-
-.stApp {
-    background:
-        radial-gradient(
-            circle at 15% 5%,
-            rgba(38, 132, 255, 0.10),
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 85% 12%,
-            rgba(0, 212, 255, 0.07),
-            transparent 25%
-        ),
-        #070B12;
-    color: #E8EDF5;
-}
-
-.block-container {
-    max-width: 1380px;
-    padding-top: 2rem;
-    padding-bottom: 5rem;
-}
-
-
-/* =========================================================
-   HIDE STREAMLIT CHROME
-   ========================================================= */
-
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-header[data-testid="stHeader"] {
-    background: transparent;
-}
-
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
-
-section[data-testid="stSidebar"] {
-    background:
-        linear-gradient(
-            180deg,
-            #0A0F18 0%,
-            #080C14 100%
-        );
-    border-right: 1px solid rgba(255,255,255,0.07);
-}
-
-section[data-testid="stSidebar"] > div {
-    padding: 1.5rem 1rem;
-}
-
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3 {
-    color: #F2F5F9;
-    font-family: 'Space Grotesk', sans-serif;
-}
-
-section[data-testid="stSidebar"] p,
-section[data-testid="stSidebar"] label {
-    color: #98A2B3 !important;
-}
-
-section[data-testid="stSidebar"] .stCaption {
-    color: #667085 !important;
-}
-
-
-/* =========================================================
-   SIDEBAR BRAND
-   ========================================================= */
-
-.sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    margin-bottom: 28px;
-}
-
-.sidebar-logo {
-    width: 38px;
-    height: 38px;
-    border-radius: 11px;
+    <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    /* ========================================================
+       GLOBAL
+       ======================================================== */
+
+    html, body, [class*="css"] {
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .stApp {
+        background:
+            radial-gradient(
+                circle at 12% 4%,
+                rgba(38, 132, 255, 0.12),
+                transparent 28%
+            ),
+            radial-gradient(
+                circle at 88% 10%,
+                rgba(0, 212, 255, 0.08),
+                transparent 25%
+            ),
+            #070B12;
+
+        color: #E8EDF5;
+    }
+
+    .block-container {
+        max-width: 1380px;
+        padding-top: 2.2rem;
+        padding-bottom: 5rem;
+    }
+
+    #MainMenu {
+        visibility: hidden;
+    }
+
+    footer {
+        visibility: hidden;
+    }
+
+    header[data-testid="stHeader"] {
+        background: transparent;
+    }
+
+
+    /* ========================================================
+       SIDEBAR
+       ======================================================== */
+
+    section[data-testid="stSidebar"] {
+        background:
+            linear-gradient(
+                180deg,
+                #0A0F18 0%,
+                #080C14 100%
+            );
+
+        border-right: 1px solid rgba(255,255,255,0.07);
+    }
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    section[data-testid="stSidebar"] > div {
+        padding: 1.6rem 1.15rem;
+    }
 
-    background:
-        linear-gradient(
-            135deg,
-            #1D6EFF,
-            #00C6FF
-        );
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] label {
+        color: #98A2B3 !important;
+    }
 
-    color: white;
-    font-size: 19px;
-    font-weight: 700;
+    section[data-testid="stSidebar"] .stCaption {
+        color: #748197 !important;
+        font-size: 13px !important;
+        line-height: 1.6 !important;
+    }
 
-    box-shadow:
-        0 8px 25px rgba(29,110,255,0.28);
-}
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 32px;
+    }
 
-.sidebar-brand-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    font-size: 15px;
-    color: #F5F7FA;
-}
+    .sidebar-logo {
+        width: 42px;
+        height: 42px;
 
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-/* =========================================================
-   SIDEBAR SECTION
-   ========================================================= */
+        border-radius: 12px;
 
-.sidebar-section {
-    margin-top: 25px;
-    margin-bottom: 10px;
+        background:
+            linear-gradient(
+                135deg,
+                #2878FF,
+                #00C6FF
+            );
 
-    font-size: 10px;
-    font-weight: 700;
+        color: white;
 
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
+        font-size: 21px;
+        font-weight: 700;
 
-    color: #667085;
-}
+        box-shadow:
+            0 9px 28px rgba(29,110,255,0.30);
+    }
 
+    .sidebar-brand-name {
+        font-family: 'Space Grotesk', sans-serif;
 
-/* =========================================================
-   SELECTBOX
-   ========================================================= */
+        font-weight: 600;
+        font-size: 16px;
 
-div[data-baseweb="select"] > div {
-    background: #101722 !important;
-    border: 1px solid #202B3A !important;
-    border-radius: 10px !important;
-    color: #E8EDF5 !important;
-}
+        color: #F5F7FA;
+    }
 
-div[data-baseweb="select"] span {
-    color: #E8EDF5 !important;
-}
+    .sidebar-section {
+        margin-top: 27px;
+        margin-bottom: 12px;
 
+        font-size: 11px;
+        font-weight: 700;
 
-/* =========================================================
-   HERO
-   ========================================================= */
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
 
-.hero {
-    position: relative;
-    overflow: hidden;
+        color: #667085;
+    }
 
-    padding: 48px 48px 42px;
 
-    border-radius: 24px;
+    /* ========================================================
+       SELECTBOX
+       ======================================================== */
 
-    background:
-        linear-gradient(
-            135deg,
-            rgba(18, 28, 44, 0.98),
-            rgba(8, 15, 26, 0.98)
-        );
+    div[data-baseweb="select"] > div {
+        background: #101722 !important;
+        border: 1px solid #202B3A !important;
+        border-radius: 11px !important;
 
-    border: 1px solid rgba(255,255,255,0.08);
+        min-height: 45px !important;
+    }
 
-    box-shadow:
-        0 30px 80px rgba(0,0,0,0.30);
+    div[data-baseweb="select"] span {
+        color: #E8EDF5 !important;
+        font-size: 14px !important;
+    }
 
-    margin-bottom: 22px;
-}
 
-.hero::before {
-    content: "";
+    /* ========================================================
+       HERO
+       ======================================================== */
 
-    position: absolute;
+    .hero {
+        position: relative;
+        overflow: hidden;
 
-    width: 420px;
-    height: 420px;
+        padding: 54px 52px 48px;
 
-    top: -250px;
-    right: -100px;
+        border-radius: 25px;
 
-    border-radius: 50%;
+        background:
+            linear-gradient(
+                135deg,
+                rgba(18, 28, 44, 0.98),
+                rgba(8, 15, 26, 0.98)
+            );
 
-    background:
-        radial-gradient(
-            circle,
-            rgba(0, 167, 255, 0.18),
-            transparent 65%
-        );
+        border: 1px solid rgba(255,255,255,0.085);
 
-    pointer-events: none;
-}
+        box-shadow:
+            0 30px 85px rgba(0,0,0,0.34);
 
-.hero::after {
-    content: "";
+        margin-bottom: 25px;
+    }
 
-    position: absolute;
+    .hero::before {
+        content: "";
 
-    width: 280px;
-    height: 280px;
+        position: absolute;
 
-    bottom: -220px;
-    left: 20%;
+        width: 500px;
+        height: 500px;
 
-    border-radius: 50%;
+        top: -290px;
+        right: -90px;
 
-    background:
-        radial-gradient(
-            circle,
-            rgba(29,110,255,0.12),
-            transparent 70%
-        );
+        border-radius: 50%;
 
-    pointer-events: none;
-}
+        background:
+            radial-gradient(
+                circle,
+                rgba(0, 167, 255, 0.20),
+                transparent 67%
+            );
 
-.hero-eyebrow {
-    position: relative;
-    z-index: 1;
+        pointer-events: none;
+    }
 
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    .hero::after {
+        content: "";
 
-    padding: 7px 12px;
+        position: absolute;
 
-    border-radius: 100px;
+        width: 340px;
+        height: 340px;
 
-    background: rgba(29,110,255,0.10);
-    border: 1px solid rgba(29,110,255,0.25);
+        bottom: -270px;
+        left: 22%;
 
-    color: #72AEFF;
+        border-radius: 50%;
 
-    font-size: 11px;
-    font-weight: 700;
+        background:
+            radial-gradient(
+                circle,
+                rgba(29,110,255,0.13),
+                transparent 70%
+            );
 
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
-}
+        pointer-events: none;
+    }
 
-.hero-dot {
-    width: 6px;
-    height: 6px;
+    .hero-eyebrow {
+        position: relative;
+        z-index: 1;
 
-    border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
 
-    background: #35D39A;
+        padding: 8px 14px;
 
-    box-shadow:
-        0 0 12px rgba(53,211,154,0.7);
-}
+        border-radius: 100px;
 
-.hero-title {
-    position: relative;
-    z-index: 1;
+        background: rgba(29,110,255,0.10);
+        border: 1px solid rgba(29,110,255,0.25);
 
-    margin-top: 18px;
+        color: #78B4FF;
 
-    font-family: 'Space Grotesk', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
 
-    font-size: clamp(38px, 5vw, 64px);
+        letter-spacing: 1.3px;
+        text-transform: uppercase;
+    }
 
-    line-height: 1.02;
+    .hero-dot {
+        width: 7px;
+        height: 7px;
 
-    font-weight: 700;
+        border-radius: 50%;
 
-    letter-spacing: -2.5px;
+        background: #35D39A;
 
-    background:
-        linear-gradient(
-            110deg,
-            #FFFFFF 10%,
-            #BBD7FF 48%,
-            #67D9FF 90%
-        );
+        box-shadow:
+            0 0 13px rgba(53,211,154,0.8);
+    }
 
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+    .hero-title {
+        position: relative;
+        z-index: 1;
 
-.hero-description {
-    position: relative;
-    z-index: 1;
+        margin-top: 20px;
 
-    max-width: 730px;
+        font-family: 'Space Grotesk', sans-serif;
 
-    margin-top: 17px;
+        font-size: clamp(44px, 5.5vw, 70px);
 
-    color: #98A6B8;
+        line-height: 1.02;
 
-    font-size: 16px;
-    line-height: 1.7;
-}
+        font-weight: 700;
 
-.hero-meta {
-    position: relative;
-    z-index: 1;
+        letter-spacing: -2.8px;
 
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+        background:
+            linear-gradient(
+                110deg,
+                #FFFFFF 10%,
+                #BBD7FF 48%,
+                #67D9FF 90%
+            );
 
-    margin-top: 25px;
-}
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
-.meta-pill {
-    padding: 7px 11px;
+    .hero-description {
+        position: relative;
+        z-index: 1;
 
-    border-radius: 7px;
+        max-width: 800px;
 
-    background: rgba(255,255,255,0.045);
+        margin-top: 20px;
 
-    border: 1px solid rgba(255,255,255,0.08);
+        color: #A2AFC0;
 
-    color: #AAB6C6;
+        font-size: 17px;
+        line-height: 1.75;
+    }
 
-    font-size: 12px;
-}
+    .hero-meta {
+        position: relative;
+        z-index: 1;
 
+        display: flex;
+        gap: 11px;
+        flex-wrap: wrap;
 
-/* =========================================================
-   SECTION HEADERS
-   ========================================================= */
+        margin-top: 29px;
+    }
 
-.section-label {
-    margin-top: 34px;
-    margin-bottom: 12px;
+    .meta-pill {
+        padding: 8px 13px;
 
-    color: #667085;
+        border-radius: 8px;
 
-    font-size: 10px;
-    font-weight: 700;
+        background: rgba(255,255,255,0.045);
 
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-}
+        border: 1px solid rgba(255,255,255,0.08);
 
-.section-title {
-    font-family: 'Space Grotesk', sans-serif;
+        color: #B2BDCC;
 
-    color: #F5F7FA;
+        font-size: 12px;
+        font-weight: 500;
+    }
 
-    font-size: 22px;
-    font-weight: 600;
 
-    margin-bottom: 16px;
-}
+    /* ========================================================
+       SECTION LABELS
+       ======================================================== */
 
+    .section-label {
+        margin-top: 38px;
+        margin-bottom: 10px;
 
-/* =========================================================
-   RESEARCH INPUT
-   ========================================================= */
+        color: #64748B;
 
-.input-shell {
-    padding: 2px;
+        font-size: 11px;
+        font-weight: 700;
 
-    border-radius: 17px;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
 
-    background:
-        linear-gradient(
-            120deg,
-            rgba(45,125,255,0.65),
-            rgba(0,205,255,0.18),
-            rgba(255,255,255,0.05)
-        );
+    .section-title {
+        font-family: 'Space Grotesk', sans-serif;
 
-    box-shadow:
-        0 15px 50px rgba(0,0,0,0.25);
-}
+        color: #F5F7FA;
 
-.input-inner {
-    background: #0D141F;
+        font-size: 25px;
+        font-weight: 600;
 
-    border-radius: 15px;
+        margin-bottom: 18px;
+    }
 
-    padding: 4px;
-}
 
+    /* ========================================================
+       INPUT
+       ======================================================== */
 
-/* =========================================================
-   TEXT AREA
-   ========================================================= */
+    .input-shell {
+        padding: 2px;
 
-.stTextArea textarea {
-    background: #0D141F !important;
+        border-radius: 18px;
 
-    color: #E8EDF5 !important;
+        background:
+            linear-gradient(
+                120deg,
+                rgba(45,125,255,0.70),
+                rgba(0,205,255,0.20),
+                rgba(255,255,255,0.06)
+            );
 
-    border: none !important;
+        box-shadow:
+            0 16px 55px rgba(0,0,0,0.28);
+    }
 
-    border-radius: 14px !important;
+    .input-inner {
+        background: #0D141F;
+        border-radius: 16px;
+        padding: 4px;
+    }
 
-    font-family: 'DM Sans', sans-serif !important;
+    .stTextArea textarea {
+        background: #0D141F !important;
 
-    font-size: 16px !important;
+        color: #E8EDF5 !important;
 
-    line-height: 1.6 !important;
+        border: none !important;
 
-    padding: 18px !important;
+        border-radius: 15px !important;
 
-    min-height: 150px !important;
+        font-family: 'DM Sans', sans-serif !important;
 
-    box-shadow: none !important;
-}
+        font-size: 17px !important;
 
-.stTextArea textarea:focus {
-    border: none !important;
+        line-height: 1.65 !important;
 
-    box-shadow:
-        0 0 0 1px rgba(60,145,255,0.3) !important;
-}
+        padding: 20px !important;
 
-.stTextArea textarea::placeholder {
-    color: #536174 !important;
-}
+        min-height: 165px !important;
 
+        box-shadow: none !important;
+    }
 
-/* =========================================================
-   PRIMARY BUTTON
-   ========================================================= */
+    .stTextArea textarea:focus {
+        border: none !important;
 
-.stButton > button {
-    border: none !important;
+        box-shadow:
+            0 0 0 1px rgba(60,145,255,0.30) !important;
+    }
 
-    border-radius: 11px !important;
+    .stTextArea textarea::placeholder {
+        color: #536174 !important;
+    }
 
-    min-height: 48px !important;
 
-    padding: 0 22px !important;
+    /* ========================================================
+       BUTTON
+       ======================================================== */
 
-    background:
-        linear-gradient(
-            135deg,
-            #2878FF,
-            #159BD7
-        ) !important;
+    .stButton > button {
+        border: none !important;
 
-    color: #FFFFFF !important;
+        border-radius: 12px !important;
 
-    font-family: 'DM Sans', sans-serif !important;
+        min-height: 52px !important;
 
-    font-size: 14px !important;
+        padding: 0 25px !important;
 
-    font-weight: 700 !important;
+        background:
+            linear-gradient(
+                135deg,
+                #2878FF,
+                #159BD7
+            ) !important;
 
-    box-shadow:
-        0 10px 28px rgba(25,113,255,0.25) !important;
+        color: #FFFFFF !important;
 
-    transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease !important;
-}
+        font-family: 'DM Sans', sans-serif !important;
 
-.stButton > button:hover {
-    transform: translateY(-1px);
+        font-size: 15px !important;
 
-    box-shadow:
-        0 14px 35px rgba(25,113,255,0.38) !important;
-}
+        font-weight: 700 !important;
 
+        box-shadow:
+            0 11px 30px rgba(25,113,255,0.28) !important;
 
-/* =========================================================
-   PIPELINE
-   ========================================================= */
+        transition:
+            transform 0.18s ease,
+            box-shadow 0.18s ease !important;
+    }
 
-.pipeline-container {
-    padding: 22px;
+    .stButton > button:hover {
+        transform: translateY(-2px);
 
-    border-radius: 18px;
+        box-shadow:
+            0 16px 40px rgba(25,113,255,0.40) !important;
+    }
 
-    background: rgba(13,20,31,0.82);
 
-    border: 1px solid rgba(255,255,255,0.07);
+    /* ========================================================
+       MODE CARDS
+       ======================================================== */
 
-    margin-top: 12px;
-}
+    .mode-card {
+        padding: 20px;
 
-.pipeline {
-    display: flex;
-    align-items: center;
+        border-radius: 14px;
 
-    gap: 7px;
+        background: #0D141F;
 
-    overflow-x: auto;
+        border: 1px solid #1D2938;
 
-    padding-bottom: 4px;
-}
+        min-height: 116px;
 
-.pipeline-node {
-    min-width: 116px;
+        transition: all 0.2s ease;
+    }
 
-    padding: 13px 12px;
+    .mode-card:hover {
+        transform: translateY(-2px);
 
-    text-align: center;
+        border-color: #2C70C9;
 
-    border-radius: 11px;
+        background: #101A28;
+    }
 
-    background: #111A27;
+    .mode-card.active {
+        border-color: rgba(48,133,255,0.58);
 
-    border: 1px solid #202D3D;
+        background:
+            linear-gradient(
+                145deg,
+                rgba(25,75,140,0.24),
+                rgba(13,20,31,0.95)
+            );
 
-    transition: all 0.2s ease;
-}
+        box-shadow:
+            0 10px 30px rgba(20,100,220,0.08);
+    }
 
-.pipeline-node:hover {
-    border-color: rgba(45,125,255,0.55);
+    .mode-name {
+        color: #F1F5F9;
 
-    background: #142033;
-}
+        font-size: 15px;
+        font-weight: 700;
+    }
 
-.pipeline-icon {
-    font-size: 16px;
+    .mode-subtitle {
+        color: #579BEA;
 
-    color: #5EAEFF;
+        font-size: 11px;
 
-    margin-bottom: 6px;
-}
+        margin-top: 4px;
 
-.pipeline-name {
-    color: #D7DFEA;
+        font-weight: 600;
+    }
 
-    font-size: 11px;
-    font-weight: 600;
+    .mode-description {
+        color: #7C899C;
 
-    line-height: 1.3;
-}
+        font-size: 13px;
 
-.pipeline-arrow {
-    color: #3A485B;
+        line-height: 1.55;
 
-    font-size: 16px;
+        margin-top: 9px;
+    }
 
-    flex-shrink: 0;
-}
 
+    /* ========================================================
+       PIPELINE
+       ======================================================== */
 
-/* =========================================================
-   MODE CARDS
-   ========================================================= */
+    .pipeline-container {
+        padding: 25px;
 
-.mode-card {
-    padding: 17px;
+        border-radius: 19px;
 
-    border-radius: 13px;
+        background:
+            linear-gradient(
+                145deg,
+                rgba(13,20,31,0.95),
+                rgba(9,15,24,0.92)
+            );
 
-    background: #0D141F;
+        border: 1px solid rgba(255,255,255,0.075);
 
-    border: 1px solid #1D2938;
+        margin-top: 13px;
+    }
 
-    height: 100%;
+    .pipeline {
+        display: flex;
+        align-items: center;
 
-    transition: all 0.2s ease;
-}
+        gap: 8px;
 
-.mode-card:hover {
-    transform: translateY(-2px);
+        overflow-x: auto;
 
-    border-color: #2C70C9;
+        padding-bottom: 5px;
+    }
 
-    background: #101A28;
-}
+    .pipeline-node {
+        min-width: 125px;
 
-.mode-card.active {
-    border-color: rgba(48,133,255,0.55);
+        padding: 16px 13px;
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(25,75,140,0.22),
-            rgba(13,20,31,0.95)
-        );
-}
+        text-align: center;
 
-.mode-name {
-    color: #F1F5F9;
+        border-radius: 12px;
 
-    font-size: 13px;
-    font-weight: 700;
-}
+        background: #111A27;
 
-.mode-description {
-    color: #738197;
+        border: 1px solid #202D3D;
 
-    font-size: 11px;
+        transition: all 0.2s ease;
+    }
 
-    line-height: 1.5;
+    .pipeline-node:hover {
+        border-color: rgba(45,125,255,0.58);
 
-    margin-top: 6px;
-}
+        background: #142033;
 
+        transform: translateY(-2px);
+    }
 
-/* =========================================================
-   STATUS
-   ========================================================= */
+    .pipeline-icon {
+        font-size: 19px;
 
-.status-panel {
-    padding: 20px;
+        color: #5EAEFF;
 
-    border-radius: 17px;
+        margin-bottom: 8px;
+    }
 
-    background:
-        linear-gradient(
-            135deg,
-            #0D1623,
-            #0B121C
-        );
+    .pipeline-name {
+        color: #D7DFEA;
 
-    border: 1px solid rgba(255,255,255,0.07);
-}
+        font-size: 12px;
+        font-weight: 600;
 
-.status-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+        line-height: 1.35;
+    }
 
-    margin-bottom: 17px;
-}
+    .pipeline-arrow {
+        color: #3A485B;
 
-.status-title {
-    color: #F1F5F9;
+        font-size: 18px;
 
-    font-family: 'Space Grotesk', sans-serif;
+        flex-shrink: 0;
+    }
 
-    font-size: 15px;
-    font-weight: 600;
-}
 
-.status-live {
-    display: flex;
-    align-items: center;
-    gap: 7px;
+    /* ========================================================
+       STATUS
+       ======================================================== */
 
-    color: #4DD9A1;
+    .status-panel {
+        padding: 23px;
 
-    font-size: 11px;
-    font-weight: 600;
-}
+        border-radius: 18px;
 
-.live-dot {
-    width: 7px;
-    height: 7px;
+        background:
+            linear-gradient(
+                135deg,
+                #0D1623,
+                #0B121C
+            );
 
-    border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.075);
+    }
 
-    background: #38D39F;
+    .status-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-    box-shadow:
-        0 0 10px rgba(56,211,159,0.75);
-}
+        margin-bottom: 18px;
+    }
 
-.agent-row {
-    display: flex;
-    align-items: center;
+    .status-title {
+        color: #F1F5F9;
 
-    gap: 12px;
+        font-family: 'Space Grotesk', sans-serif;
 
-    padding: 10px 0;
+        font-size: 17px;
+        font-weight: 600;
+    }
 
-    border-bottom: 1px solid rgba(255,255,255,0.045);
-}
+    .status-live {
+        display: flex;
+        align-items: center;
+        gap: 8px;
 
-.agent-row:last-child {
-    border-bottom: none;
-}
+        color: #4DD9A1;
 
-.agent-number {
-    width: 26px;
-    height: 26px;
+        font-size: 11px;
+        font-weight: 700;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+        letter-spacing: 0.7px;
+    }
 
-    border-radius: 8px;
+    .live-dot {
+        width: 8px;
+        height: 8px;
 
-    background: #111D2C;
+        border-radius: 50%;
 
-    color: #73AEFF;
+        background: #38D39F;
 
-    font-size: 10px;
-    font-weight: 700;
-}
+        box-shadow:
+            0 0 11px rgba(56,211,159,0.75);
+    }
 
-.agent-name {
-    color: #C7D0DD;
+    .agent-row {
+        display: flex;
+        align-items: center;
 
-    font-size: 12px;
-}
+        gap: 13px;
 
-.agent-state {
-    margin-left: auto;
+        padding: 12px 0;
 
-    color: #69788C;
+        border-bottom: 1px solid rgba(255,255,255,0.045);
+    }
 
-    font-size: 10px;
-}
+    .agent-row:last-child {
+        border-bottom: none;
+    }
 
+    .agent-number {
+        width: 29px;
+        height: 29px;
 
-/* =========================================================
-   REPORT
-   ========================================================= */
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-.report-shell {
-    margin-top: 28px;
+        border-radius: 8px;
 
-    border-radius: 20px;
+        background: #111D2C;
 
-    background:
-        linear-gradient(
-            145deg,
-            #0D141F,
-            #0A111A
-        );
+        color: #73AEFF;
 
-    border: 1px solid rgba(255,255,255,0.075);
+        font-size: 10px;
+        font-weight: 700;
+    }
 
-    overflow: hidden;
+    .agent-name {
+        color: #C7D0DD;
 
-    box-shadow:
-        0 25px 65px rgba(0,0,0,0.28);
-}
+        font-size: 13px;
+        font-weight: 500;
+    }
 
-.report-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    .agent-state {
+        margin-left: auto;
 
-    padding: 21px 25px;
+        color: #69788C;
 
-    border-bottom: 1px solid rgba(255,255,255,0.065);
-}
+        font-size: 11px;
+    }
 
-.report-header-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
 
-    color: #F3F6FA;
+    /* ========================================================
+       REPORT
+       ======================================================== */
 
-    font-family: 'Space Grotesk', sans-serif;
+    .report-shell {
+        margin-top: 28px;
 
-    font-size: 15px;
-    font-weight: 600;
-}
+        border-radius: 21px;
 
-.report-mark {
-    width: 28px;
-    height: 28px;
+        background:
+            linear-gradient(
+                145deg,
+                #0D141F,
+                #0A111A
+            );
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+        border: 1px solid rgba(255,255,255,0.075);
 
-    border-radius: 8px;
+        overflow: hidden;
 
-    background: rgba(39,121,255,0.12);
+        box-shadow:
+            0 25px 65px rgba(0,0,0,0.28);
+    }
 
-    color: #69A9FF;
-}
+    .report-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-.report-badge {
-    padding: 6px 9px;
+        padding: 23px 27px;
 
-    border-radius: 6px;
+        border-bottom: 1px solid rgba(255,255,255,0.065);
+    }
 
-    background: rgba(53,211,154,0.08);
+    .report-header-title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
 
-    border: 1px solid rgba(53,211,154,0.15);
+        color: #F3F6FA;
 
-    color: #4DD9A1;
+        font-family: 'Space Grotesk', sans-serif;
 
-    font-size: 9px;
-    font-weight: 700;
+        font-size: 17px;
+        font-weight: 600;
+    }
 
-    letter-spacing: 0.8px;
-}
+    .report-mark {
+        width: 31px;
+        height: 31px;
 
-.report-content {
-    padding: 30px 34px;
-}
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-.report-content h1,
-.report-content h2,
-.report-content h3 {
-    font-family: 'Space Grotesk', sans-serif;
+        border-radius: 8px;
 
-    color: #F4F7FA;
-}
+        background: rgba(39,121,255,0.12);
 
-.report-content h1 {
-    font-size: 28px;
-}
+        color: #69A9FF;
+    }
 
-.report-content h2 {
-    font-size: 21px;
+    .report-badge {
+        padding: 7px 10px;
 
-    margin-top: 30px;
+        border-radius: 7px;
 
-    padding-bottom: 8px;
+        background: rgba(53,211,154,0.08);
 
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-}
+        border: 1px solid rgba(53,211,154,0.15);
 
-.report-content h3 {
-    font-size: 16px;
-}
+        color: #4DD9A1;
 
-.report-content p,
-.report-content li {
-    color: #AAB6C6;
+        font-size: 10px;
+        font-weight: 700;
 
-    font-size: 14px;
+        letter-spacing: 0.8px;
+    }
 
-    line-height: 1.75;
-}
+    .report-content {
+        padding: 34px;
+    }
 
-.report-content strong {
-    color: #E8EEF6;
-}
+    .report-content h1,
+    .report-content h2,
+    .report-content h3 {
+        font-family: 'Space Grotesk', sans-serif;
 
-.report-content blockquote {
-    border-left: 3px solid #2779FF;
+        color: #F4F7FA;
+    }
 
-    background: rgba(39,121,255,0.055);
+    .report-content h1 {
+        font-size: 30px;
+    }
 
-    padding: 12px 16px;
+    .report-content h2 {
+        font-size: 23px;
 
-    color: #AAB8CA;
-}
+        margin-top: 32px;
 
-.report-content code {
-    background: #111B29;
+        padding-bottom: 9px;
 
-    color: #7FC3FF;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
 
-    padding: 2px 6px;
+    .report-content h3 {
+        font-size: 18px;
+    }
 
-    border-radius: 5px;
-}
+    .report-content p,
+    .report-content li {
+        color: #AAB6C6;
 
+        font-size: 15px;
 
-/* =========================================================
-   SOURCE CARDS
-   ========================================================= */
+        line-height: 1.8;
+    }
 
-.source-card {
-    padding: 15px 17px;
+    .report-content strong {
+        color: #E8EEF6;
+    }
 
-    border-radius: 11px;
+    .report-content blockquote {
+        border-left: 3px solid #2779FF;
 
-    background: #0D141F;
+        background: rgba(39,121,255,0.055);
 
-    border: 1px solid #1D2938;
+        padding: 13px 17px;
 
-    margin-bottom: 9px;
+        color: #AAB8CA;
+    }
 
-    transition: all 0.2s ease;
-}
+    .report-content code {
+        background: #111B29;
 
-.source-card:hover {
-    border-color: #285A91;
+        color: #7FC3FF;
 
-    transform: translateX(2px);
-}
+        padding: 2px 6px;
 
-.source-title {
-    color: #DCE4EE;
+        border-radius: 5px;
+    }
 
-    font-size: 13px;
-    font-weight: 600;
 
-    margin-bottom: 6px;
-}
+    /* ========================================================
+       SOURCE CARDS
+       ======================================================== */
 
-.source-url {
-    color: #579BEA;
+    .source-card {
+        padding: 17px 19px;
 
-    font-size: 11px;
+        border-radius: 12px;
 
-    word-break: break-all;
-}
+        background: #0D141F;
 
+        border: 1px solid #1D2938;
 
-/* =========================================================
-   DIVIDERS
-   ========================================================= */
+        margin-bottom: 10px;
 
-hr {
-    border-color: rgba(255,255,255,0.07) !important;
-}
+        transition: all 0.2s ease;
+    }
 
+    .source-card:hover {
+        border-color: #285A91;
 
-/* =========================================================
-   ALERTS
-   ========================================================= */
+        transform: translateX(2px);
+    }
 
-div[data-testid="stAlert"] {
-    border-radius: 10px !important;
-}
+    .source-title {
+        color: #DCE4EE;
 
+        font-size: 14px;
+        font-weight: 600;
 
-/* =========================================================
-   STATUS COMPONENT
-   ========================================================= */
+        margin-bottom: 7px;
+    }
 
-div[data-testid="stStatusWidget"] {
-    background: #0D141F !important;
+    .source-url {
+        color: #579BEA;
 
-    border: 1px solid #1D2938 !important;
+        font-size: 12px;
 
-    border-radius: 14px !important;
-}
+        word-break: break-all;
+    }
 
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
+    /* ========================================================
+       STREAMLIT STATUS
+       ======================================================== */
 
-.footer {
-    text-align: center;
+    div[data-testid="stStatusWidget"] {
+        background: #0D141F !important;
 
-    margin-top: 45px;
+        border: 1px solid #1D2938 !important;
 
-    padding-top: 22px;
+        border-radius: 14px !important;
+    }
 
-    border-top: 1px solid rgba(255,255,255,0.06);
 
-    color: #475467;
+    /* ========================================================
+       FOOTER
+       ======================================================== */
 
-    font-size: 11px;
-}
+    .footer {
+        text-align: center;
 
-</style>
-""",
-    unsafe_allow_html=True,
+        margin-top: 50px;
+
+        padding-top: 24px;
+
+        border-top: 1px solid rgba(255,255,255,0.06);
+
+        color: #475467;
+
+        font-size: 12px;
+
+        line-height: 1.7;
+    }
+
+    </style>
+    """
 )
 
 
@@ -1000,19 +989,19 @@ div[data-testid="stStatusWidget"] {
 
 with st.sidebar:
 
-    st.markdown(
+    st.html(
         """
         <div class="sidebar-brand">
             <div class="sidebar-logo">◈</div>
-            <div class="sidebar-brand-name">Research Intelligence</div>
+            <div class="sidebar-brand-name">
+                Research Intelligence
+            </div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
-    st.markdown(
-        '<div class="sidebar-section">Research Configuration</div>',
-        unsafe_allow_html=True,
+    st.html(
+        '<div class="sidebar-section">Research Configuration</div>'
     )
 
     research_depth = st.selectbox(
@@ -1030,26 +1019,27 @@ with st.sidebar:
 
     st.caption(depth_info[research_depth])
 
-    st.markdown(
-        '<div class="sidebar-section">Research Sources</div>',
-        unsafe_allow_html=True,
+    st.html(
+        '<div class="sidebar-section">Research Sources</div>'
     )
 
-    st.markdown(
+    st.html(
         """
-        <div style="line-height:2.1;color:#8794A7;font-size:12px;">
-        ◉ Web &nbsp;·&nbsp; Current information<br>
-        ◉ Academic &nbsp;·&nbsp; Scholarly literature<br>
-        ◉ Industry &nbsp;·&nbsp; Companies & market evidence<br>
-        ◉ Verification &nbsp;·&nbsp; Claim checking
+        <div style="
+            line-height:2.15;
+            color:#8794A7;
+            font-size:13px;
+        ">
+            ◉ Web · Current information<br>
+            ◉ Academic · Scholarly literature<br>
+            ◉ Industry · Market evidence<br>
+            ◉ Verification · Claim checking
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
-    st.markdown(
-        '<div class="sidebar-section">Agent Team</div>',
-        unsafe_allow_html=True,
+    st.html(
+        '<div class="sidebar-section">Agent Team</div>'
     )
 
     agents = [
@@ -1063,37 +1053,41 @@ with st.sidebar:
     ]
 
     for i, agent in enumerate(agents, 1):
-        st.markdown(
+
+        st.html(
             f"""
             <div style="
                 display:flex;
                 align-items:center;
-                gap:9px;
-                margin:8px 0;
-                color:#7F8DA1;
-                font-size:11px;
+                gap:10px;
+                margin:10px 0;
+                color:#8794A7;
+                font-size:13px;
             ">
+
                 <span style="
-                    width:20px;
-                    height:20px;
+                    width:23px;
+                    height:23px;
                     display:flex;
                     align-items:center;
                     justify-content:center;
-                    border-radius:6px;
+                    border-radius:7px;
                     background:#111A27;
                     color:#5D9FEF;
-                    font-size:9px;
+                    font-size:10px;
                     font-weight:700;
-                ">{i}</span>
+                ">
+                    {i}
+                </span>
+
                 {agent}
+
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
-    st.markdown(
-        '<div class="sidebar-section">System</div>',
-        unsafe_allow_html=True,
+    st.html(
+        '<div class="sidebar-section">System Status</div>'
     )
 
     groq_ready = bool(os.getenv("GROQ_API_KEY"))
@@ -1102,23 +1096,31 @@ with st.sidebar:
     groq_status = "Connected" if groq_ready else "Missing"
     tavily_status = "Connected" if tavily_ready else "Missing"
 
-    st.markdown(
+    groq_color = "#42D69C" if groq_ready else "#F97066"
+    tavily_color = "#42D69C" if tavily_ready else "#F97066"
+
+    st.html(
         f"""
         <div style="
-            padding:12px;
-            border-radius:10px;
+            padding:15px;
+            border-radius:11px;
             background:#0D141F;
             border:1px solid #1D2938;
         ">
+
             <div style="
                 display:flex;
                 justify-content:space-between;
-                margin-bottom:8px;
+                margin-bottom:11px;
                 color:#8794A7;
-                font-size:11px;
+                font-size:13px;
             ">
                 <span>LLM Service</span>
-                <span style="color:{'#42D69C' if groq_ready else '#F97066'};">
+
+                <span style="
+                    color:{groq_color};
+                    font-weight:600;
+                ">
                     {groq_status}
                 </span>
             </div>
@@ -1127,16 +1129,20 @@ with st.sidebar:
                 display:flex;
                 justify-content:space-between;
                 color:#8794A7;
-                font-size:11px;
+                font-size:13px;
             ">
                 <span>Web Search</span>
-                <span style="color:{'#42D69C' if tavily_ready else '#F97066'};">
+
+                <span style="
+                    color:{tavily_color};
+                    font-weight:600;
+                ">
                     {tavily_status}
                 </span>
             </div>
+
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
@@ -1144,7 +1150,7 @@ with st.sidebar:
 # HERO
 # ============================================================
 
-st.markdown(
+st.html(
     """
     <div class="hero">
 
@@ -1165,15 +1171,27 @@ st.markdown(
         </div>
 
         <div class="hero-meta">
-            <div class="meta-pill">7 Specialized Agents</div>
-            <div class="meta-pill">Multi-Source Research</div>
-            <div class="meta-pill">Evidence Verification</div>
-            <div class="meta-pill">Structured Reports</div>
+
+            <div class="meta-pill">
+                7 Specialized Agents
+            </div>
+
+            <div class="meta-pill">
+                Multi-Source Research
+            </div>
+
+            <div class="meta-pill">
+                Evidence Verification
+            </div>
+
+            <div class="meta-pill">
+                Structured Reports
+            </div>
+
         </div>
 
     </div>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 
@@ -1181,17 +1199,24 @@ st.markdown(
 # RESEARCH QUESTION
 # ============================================================
 
-st.markdown(
-    '<div class="section-label">01 · Investigation</div>',
-    unsafe_allow_html=True,
+st.html(
+    """
+    <div class="section-label">
+        01 · Investigation
+    </div>
+
+    <div class="section-title">
+        What do you want to investigate?
+    </div>
+    """
 )
 
-st.markdown(
-    '<div class="section-title">What do you want to investigate?</div>',
-    unsafe_allow_html=True,
+st.html(
+    """
+    <div class="input-shell">
+        <div class="input-inner">
+    """
 )
-
-st.markdown('<div class="input-shell"><div class="input-inner">', unsafe_allow_html=True)
 
 question = st.text_area(
     "Research question",
@@ -1200,20 +1225,32 @@ question = st.text_area(
         "Example: What are the major opportunities, risks and "
         "market trends for AI-powered cybersecurity platforms?"
     ),
-    height=155,
+    height=165,
     label_visibility="collapsed",
 )
 
-st.markdown("</div></div>", unsafe_allow_html=True)
+st.html(
+    """
+        </div>
+    </div>
+    """
+)
 
 
 # ============================================================
-# MODE CARDS
+# RESEARCH MODES
 # ============================================================
 
-st.markdown(
-    '<div class="section-label">02 · Research Depth</div>',
-    unsafe_allow_html=True,
+st.html(
+    """
+    <div class="section-label">
+        02 · Research Depth
+    </div>
+
+    <div class="section-title">
+        Choose your investigation depth
+    </div>
+    """
 )
 
 mode_cols = st.columns(3)
@@ -1241,48 +1278,53 @@ for col, (name, subtitle, description) in zip(mode_cols, mode_data):
     active = name == research_depth
 
     with col:
-        st.markdown(
+
+        st.html(
             f"""
             <div class="mode-card {'active' if active else ''}">
+
                 <div style="
                     display:flex;
                     justify-content:space-between;
                     align-items:center;
                 ">
+
                     <div>
-                        <div class="mode-name">{name}</div>
-                        <div style="
-                            color:#579BEA;
-                            font-size:10px;
-                            margin-top:3px;
-                            font-weight:600;
-                        ">
+
+                        <div class="mode-name">
+                            {name}
+                        </div>
+
+                        <div class="mode-subtitle">
                             {subtitle}
                         </div>
+
                     </div>
 
                     <div style="
-                        width:8px;
-                        height:8px;
+                        width:9px;
+                        height:9px;
                         border-radius:50%;
                         background:{'#4DD9A1' if active else '#273447'};
-                    "></div>
+                    ">
+                    </div>
+
                 </div>
 
                 <div class="mode-description">
                     {description}
                 </div>
+
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
 
 # ============================================================
-# START BUTTON
+# START
 # ============================================================
 
-st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
+st.html("<div style='height:18px'></div>")
 
 start_research = st.button(
     "◈   Start Intelligence Research",
@@ -1295,17 +1337,19 @@ start_research = st.button(
 # PIPELINE
 # ============================================================
 
-st.markdown(
-    '<div class="section-label">03 · Agent Architecture</div>',
-    unsafe_allow_html=True,
+st.html(
+    """
+    <div class="section-label">
+        03 · Agent Architecture
+    </div>
+
+    <div class="section-title">
+        Seven agents. One research workflow.
+    </div>
+    """
 )
 
-st.markdown(
-    '<div class="section-title">Seven agents. One research workflow.</div>',
-    unsafe_allow_html=True,
-)
-
-st.markdown(
+st.html(
     """
     <div class="pipeline-container">
 
@@ -1313,56 +1357,69 @@ st.markdown(
 
             <div class="pipeline-node">
                 <div class="pipeline-icon">⌁</div>
-                <div class="pipeline-name">Research<br>Planner</div>
+                <div class="pipeline-name">
+                    Research<br>Planner
+                </div>
             </div>
 
             <div class="pipeline-arrow">→</div>
 
             <div class="pipeline-node">
                 <div class="pipeline-icon">◉</div>
-                <div class="pipeline-name">Web<br>Researcher</div>
+                <div class="pipeline-name">
+                    Web<br>Researcher
+                </div>
             </div>
 
             <div class="pipeline-arrow">→</div>
 
             <div class="pipeline-node">
                 <div class="pipeline-icon">◇</div>
-                <div class="pipeline-name">Academic<br>Researcher</div>
+                <div class="pipeline-name">
+                    Academic<br>Researcher
+                </div>
             </div>
 
             <div class="pipeline-arrow">→</div>
 
             <div class="pipeline-node">
                 <div class="pipeline-icon">▣</div>
-                <div class="pipeline-name">Industry<br>Researcher</div>
+                <div class="pipeline-name">
+                    Industry<br>Researcher
+                </div>
             </div>
 
             <div class="pipeline-arrow">→</div>
 
             <div class="pipeline-node">
                 <div class="pipeline-icon">◎</div>
-                <div class="pipeline-name">Evidence<br>Analyst</div>
+                <div class="pipeline-name">
+                    Evidence<br>Analyst
+                </div>
             </div>
 
             <div class="pipeline-arrow">→</div>
 
             <div class="pipeline-node">
                 <div class="pipeline-icon">✓</div>
-                <div class="pipeline-name">Fact<br>Checker</div>
+                <div class="pipeline-name">
+                    Fact<br>Checker
+                </div>
             </div>
 
             <div class="pipeline-arrow">→</div>
 
             <div class="pipeline-node">
                 <div class="pipeline-icon">✦</div>
-                <div class="pipeline-name">Research<br>Synthesizer</div>
+                <div class="pipeline-name">
+                    Research<br>Synthesizer
+                </div>
             </div>
 
         </div>
 
     </div>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 
@@ -1373,94 +1430,97 @@ st.markdown(
 if start_research:
 
     if not question.strip():
-        st.warning("Enter a research question before starting the investigation.")
+        st.warning(
+            "Enter a research question before starting the investigation."
+        )
         st.stop()
 
     if not os.getenv("GROQ_API_KEY"):
-        st.error("GROQ_API_KEY is not configured in Streamlit Secrets.")
+        st.error(
+            "GROQ_API_KEY is not configured in Streamlit Secrets."
+        )
         st.stop()
 
     if not os.getenv("TAVILY_API_KEY"):
         st.warning(
-            "TAVILY_API_KEY is not configured. Web and industry research may be limited."
+            "TAVILY_API_KEY is not configured. "
+            "Web and industry research may be limited."
         )
 
     # --------------------------------------------------------
     # STATUS
     # --------------------------------------------------------
 
-    st.markdown(
-        '<div class="section-label">04 · Live Workflow</div>',
-        unsafe_allow_html=True,
+    st.html(
+        """
+        <div class="section-label">
+            04 · Live Workflow
+        </div>
+        """
     )
 
-    status_placeholder = st.empty()
+    st.html(
+        """
+        <div class="status-panel">
 
-    with status_placeholder.container():
+            <div class="status-header">
 
-        st.markdown(
-            """
-            <div class="status-panel">
-
-                <div class="status-header">
-
-                    <div class="status-title">
-                        Research Team
-                    </div>
-
-                    <div class="status-live">
-                        <span class="live-dot"></span>
-                        PROCESSING
-                    </div>
-
+                <div class="status-title">
+                    Research Team
                 </div>
 
-                <div class="agent-row">
-                    <div class="agent-number">01</div>
-                    <div class="agent-name">Research Planner</div>
-                    <div class="agent-state">Planning</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">02</div>
-                    <div class="agent-name">Web Researcher</div>
-                    <div class="agent-state">Gathering evidence</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">03</div>
-                    <div class="agent-name">Academic Researcher</div>
-                    <div class="agent-state">Searching literature</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">04</div>
-                    <div class="agent-name">Industry Researcher</div>
-                    <div class="agent-state">Analyzing industry</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">05</div>
-                    <div class="agent-name">Evidence Analyst</div>
-                    <div class="agent-state">Comparing evidence</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">06</div>
-                    <div class="agent-name">Fact Checker</div>
-                    <div class="agent-state">Verifying claims</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">07</div>
-                    <div class="agent-name">Research Synthesizer</div>
-                    <div class="agent-state">Preparing report</div>
+                <div class="status-live">
+                    <span class="live-dot"></span>
+                    PROCESSING
                 </div>
 
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
+
+            <div class="agent-row">
+                <div class="agent-number">01</div>
+                <div class="agent-name">Research Planner</div>
+                <div class="agent-state">Planning</div>
+            </div>
+
+            <div class="agent-row">
+                <div class="agent-number">02</div>
+                <div class="agent-name">Web Researcher</div>
+                <div class="agent-state">Gathering evidence</div>
+            </div>
+
+            <div class="agent-row">
+                <div class="agent-number">03</div>
+                <div class="agent-name">Academic Researcher</div>
+                <div class="agent-state">Searching literature</div>
+            </div>
+
+            <div class="agent-row">
+                <div class="agent-number">04</div>
+                <div class="agent-name">Industry Researcher</div>
+                <div class="agent-state">Analyzing industry</div>
+            </div>
+
+            <div class="agent-row">
+                <div class="agent-number">05</div>
+                <div class="agent-name">Evidence Analyst</div>
+                <div class="agent-state">Comparing evidence</div>
+            </div>
+
+            <div class="agent-row">
+                <div class="agent-number">06</div>
+                <div class="agent-name">Fact Checker</div>
+                <div class="agent-state">Verifying claims</div>
+            </div>
+
+            <div class="agent-row">
+                <div class="agent-number">07</div>
+                <div class="agent-name">Research Synthesizer</div>
+                <div class="agent-state">Preparing report</div>
+            </div>
+
+        </div>
+        """
+    )
 
     progress = st.status(
         "Agents are conducting the investigation...",
@@ -1471,11 +1531,25 @@ if start_research:
 
         with progress:
 
-            st.write("Research Planner is structuring the investigation.")
-            st.write("Research agents are gathering evidence.")
-            st.write("Evidence Analyst is comparing findings.")
-            st.write("Fact Checker is validating important claims.")
-            st.write("Research Synthesizer is preparing the final report.")
+            st.write(
+                "Research Planner is structuring the investigation."
+            )
+
+            st.write(
+                "Research agents are gathering evidence."
+            )
+
+            st.write(
+                "Evidence Analyst is comparing findings."
+            )
+
+            st.write(
+                "Fact Checker is validating important claims."
+            )
+
+            st.write(
+                "Research Synthesizer is preparing the final report."
+            )
 
             research_crew = ResearchCrew()
 
@@ -1496,13 +1570,12 @@ if start_research:
 
         report = clean_markdown(str(result))
 
-        st.markdown(
-            '<div class="section-label">05 · Intelligence Report</div>',
-            unsafe_allow_html=True,
-        )
+        st.html(
+            """
+            <div class="section-label">
+                05 · Intelligence Report
+            </div>
 
-        st.markdown(
-            f"""
             <div class="report-shell">
 
                 <div class="report-header">
@@ -1518,24 +1591,22 @@ if start_research:
                     </div>
 
                     <div class="report-badge">
-                        VERIFIED WORKFLOW
+                        COMPLETED
                     </div>
 
                 </div>
 
                 <div class="report-content">
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         st.markdown(report)
 
-        st.markdown(
+        st.html(
             """
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
         # ----------------------------------------------------
@@ -1546,14 +1617,16 @@ if start_research:
 
         if sources:
 
-            st.markdown(
-                '<div class="section-label">06 · Evidence Base</div>',
-                unsafe_allow_html=True,
-            )
+            st.html(
+                """
+                <div class="section-label">
+                    06 · Evidence Base
+                </div>
 
-            st.markdown(
-                '<div class="section-title">Research Sources</div>',
-                unsafe_allow_html=True,
+                <div class="section-title">
+                    Research Sources
+                </div>
+                """
             )
 
             for source in sources:
@@ -1567,7 +1640,7 @@ if start_research:
                     quote=True,
                 )
 
-                st.markdown(
+                st.html(
                     f"""
                     <div class="source-card">
 
@@ -1580,8 +1653,7 @@ if start_research:
                         </div>
 
                     </div>
-                    """,
-                    unsafe_allow_html=True,
+                    """
                 )
 
     except Exception as exc:
@@ -1601,11 +1673,13 @@ if start_research:
         ):
 
             st.error(
-                "The research workflow reached the current Groq token-per-minute limit."
+                "The research workflow reached the current "
+                "Groq token-per-minute limit."
             )
 
             st.info(
-                "Try Quick research after the current rate-limit window resets."
+                "Try Quick research after the current "
+                "rate-limit window resets."
             )
 
         else:
@@ -1622,14 +1696,18 @@ if start_research:
 # FOOTER
 # ============================================================
 
-st.markdown(
+st.html(
     """
     <div class="footer">
+
         Research Intelligence · Multi-Agent Research System
+
         <br>
-        AI-generated research should be verified against cited sources
-        before high-stakes use.
+
+        AI-generated research should be verified against
+        cited sources before high-stakes use.
+
     </div>
-    """,
-    unsafe_allow_html=True,
+    """
 )
+```
