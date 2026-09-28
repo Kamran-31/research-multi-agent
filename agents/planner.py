@@ -5,15 +5,13 @@ from config.llm import get_llm
 def create_planner() -> Agent:
     return Agent(
         role="Research Planning Specialist",
-        goal=(
-            "Convert the user's question into a concise research plan "
-            "with focused subquestions and evidence requirements."
-        ),
+        goal="Create a compact research plan for the user's question.",
         backstory=(
-            "You are a research strategist. You identify the exact questions "
-            "that need to be answered and the evidence required to answer them."
+            "You are an expert research strategist. "
+            "Break complex questions into focused research areas "
+            "without unnecessary explanation."
         ),
-        llm=get_llm(),
+        llm=get_llm(500),
         allow_delegation=False,
         max_iter=1,
         verbose=False,
