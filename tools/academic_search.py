@@ -74,7 +74,7 @@ Year: {work.get("publication_year")}
 URL: {url}
 Citations: {work.get("cited_by_count", 0)}
 Abstract:
-{abstract[:1800]}
+{abstract[:900]}
 """
             )
 
