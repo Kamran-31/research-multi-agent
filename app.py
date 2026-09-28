@@ -1002,6 +1002,32 @@ st.html(
         box-shadow: none !important;
     }
 
+    /* Question textarea fix */
+    div[data-testid="stTextArea"] {
+        width: 100%;
+    )
+
+
+    /* Mobile pipeline fix */
+    @media (max-width: 768px) {
+        .pipeline {
+            flex-direction: column;
+            align-items: stretch;
+            overflow-x: visible;
+        }
+
+        .pipeline-node {
+            width: 100%;
+            max-width: none;
+        }
+
+        .pipeline-arrow {
+            transform: rotate(90deg);
+            align-self: center;
+            margin: 4px 0;
+        }
+    }
+    
     </style>
     """
 )
