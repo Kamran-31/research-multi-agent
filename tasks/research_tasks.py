@@ -5,7 +5,10 @@ def create_tasks(
     agents: dict,
     question: str,
     depth: str,
-    max_results: int
+    max_results: int,
+    web_evidence: str = "",
+    academic_evidence: str = "",
+    industry_evidence: str = "",
 ) -> list[Task]:
 
     planner = Task(
@@ -16,7 +19,7 @@ Create a compact research plan for:
 
 Research depth: {depth}
 
-Return ONLY:
+Return:
 
 Objective:
 Subquestions:
@@ -26,55 +29,54 @@ Subquestions:
 - ...
 
 Evidence needed:
-- ...
 
-Maximum 4 subquestions.
-Maximum 180 words.
+Maximum 150 words.
 """,
-        expected_output="A compact research plan under 180 words.",
+        expected_output="A concise research plan.",
         agent=agents["planner"],
     )
 
     web = Task(
         description=f"""
-Research this question:
+Analyze the following web research collected for this question:
 
+QUESTION:
 {question}
 
-Use the research plan.
+WEB EVIDENCE:
+{web_evidence}
 
-Search for reliable current web evidence.
+Identify the most relevant findings.
 
-Return at most {max_results} important findings.
-
-For each finding use:
+For each finding:
 
 Finding:
 Evidence:
 Source:
 URL:
 
-Rules:
-- Prefer official and primary sources.
-- Do not write an essay.
-- Do not repeat the question.
-- Do not invent sources.
-- Maximum 350 words.
+Maximum {max_results} findings.
+Maximum 300 words.
+
+Do not search the web.
+Do not invent information.
 """,
-        expected_output="A compact web evidence dossier under 350 words.",
+        expected_output="A concise web evidence dossier.",
         agent=agents["web_researcher"],
         context=[planner],
     )
 
     academic = Task(
         description=f"""
-Research this question using scholarly literature:
+Analyze the following academic research collected for this question:
 
+QUESTION:
 {question}
 
-Use the research plan.
+ACADEMIC EVIDENCE:
+{academic_evidence}
 
-Return at most {max_results} relevant academic works.
+Identify the most relevant scholarly findings.
 
 For each:
 
@@ -84,33 +86,28 @@ Year:
 URL/DOI:
 Limitation:
 
-Rules:
-- Prefer relevant scholarly evidence.
-- Do not write a literature review.
-- Do not invent papers.
-- Maximum 350 words.
+Maximum {max_results} works.
+Maximum 300 words.
+
+Do not search the web.
+Do not invent papers.
 """,
-        expected_output="A compact academic evidence dossier under 350 words.",
+        expected_output="A concise academic evidence dossier.",
         agent=agents["academic_researcher"],
         context=[planner],
     )
 
     industry = Task(
         description=f"""
-Investigate the industry side of:
+Analyze the following industry research collected for this question:
 
+QUESTION:
 {question}
 
-Use the research plan.
+INDUSTRY EVIDENCE:
+{industry_evidence}
 
-Find evidence involving:
-- companies
-- products
-- deployments
-- adoption
-- real-world implementations
-
-Return at most {max_results} important findings.
+Identify the most relevant findings.
 
 For each:
 
@@ -119,80 +116,72 @@ Evidence:
 Organization:
 URL:
 
-Rules:
-- Clearly identify company claims.
-- Do not write an industry essay.
-- Do not invent sources.
-- Maximum 350 words.
+Maximum {max_results} findings.
+Maximum 300 words.
+
+Clearly distinguish company claims from independent evidence.
+
+Do not search the web.
+Do not invent information.
 """,
-        expected_output="A compact industry evidence dossier under 350 words.",
+        expected_output="A concise industry evidence dossier.",
         agent=agents["industry_researcher"],
         context=[planner],
     )
 
     evidence = Task(
         description="""
-Analyze the supplied web, academic and industry research.
+Analyze the three research dossiers.
 
 Create a compact evidence map.
 
-Return ONLY:
+For each major claim:
 
-CLAIM 1
 Claim:
 Supporting Evidence:
 Sources:
 Agreement/Conflict:
-Strength:
+Evidence Strength:
 Gap:
 
-CLAIM 2
-...
-
 Maximum 5 major claims.
-Maximum 500 words.
+Maximum 450 words.
 
 Do not introduce outside information.
-Do not write the final report.
 """,
-        expected_output="A compact evidence map containing no more than five major claims.",
+        expected_output="A compact evidence map.",
         agent=agents["evidence_analyst"],
         context=[web, academic, industry],
     )
 
     fact_check = Task(
         description="""
-Fact-check the evidence map.
+Evaluate the important claims in the evidence map against the
+research dossiers supplied earlier.
 
-Focus ONLY on the most important claims.
-
-Prioritize:
-- statistics
-- dates
-- major numerical claims
-- company/product claims
-- potentially conflicting claims
-
-Verify only where necessary.
-
-Return at most 5 checks:
+For each important claim:
 
 Claim:
 Status:
-Evidence:
-Source URL:
+Supporting Evidence:
+Source:
 
 Status must be one of:
+
 Confirmed
 Partially supported
 Conflicting
 Unverified
 
-Maximum 450 words.
+Maximum 5 checks.
+Maximum 400 words.
+
+Do not perform external searches.
+Do not invent verification evidence.
 """,
-        expected_output="A compact fact-check containing no more than five verified claims.",
+        expected_output="A concise fact-check dossier.",
         agent=agents["fact_checker"],
-        context=[evidence],
+        context=[web, academic, industry, evidence],
     )
 
     synthesis = Task(
@@ -201,9 +190,7 @@ Write the final research report for:
 
 {question}
 
-Use ONLY:
-1. The evidence map.
-2. The fact-check results.
+Use ONLY the supplied evidence map and fact-check results.
 
 Structure:
 
@@ -227,16 +214,12 @@ Rules:
 - Do not invent statistics.
 - Do not invent sources.
 - Do not invent quotations.
+- Preserve contradictions.
 - Clearly identify unverified claims.
-- Preserve important contradictions.
 - Include source URLs.
-- Keep the report concise.
-- Maximum approximately 900 words.
+- Maximum 800 words.
 """,
-        expected_output=(
-            "A concise evidence-based research report with "
-            "clear uncertainty and source URLs."
-        ),
+        expected_output="A concise evidence-based research report.",
         agent=agents["synthesizer"],
         context=[evidence, fact_check],
     )
