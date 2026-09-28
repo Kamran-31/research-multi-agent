@@ -24,7 +24,7 @@ def web_search_tool(query: str) -> str:
 
     try:
         max_results = int(
-            os.getenv("RESEARCH_MAX_RESULTS", "4")
+            os.getenv("RESEARCH_MAX_RESULTS", "2")
         )
 
         client = get_tavily_client()
