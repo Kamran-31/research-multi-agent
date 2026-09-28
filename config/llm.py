@@ -4,11 +4,8 @@ import crewai.llms.cache as _crewai_cache
 from crewai import LLM
 
 
-# CrewAI can inject "cache_breakpoint" into messages.
-# Groq does not accept this field in chat messages.
-# Disable that injection for the Groq/LiteLLM path.
+# Prevent CrewAI from sending cache_breakpoint to Groq.
 _crewai_cache.mark_cache_breakpoint = lambda msg: msg
-
 
 MODEL_NAME = "openai/gpt-oss-120b"
 
@@ -18,5 +15,5 @@ def get_llm() -> LLM:
     return LLM(
         model=f"groq/{MODEL_NAME}",
         temperature=0.1,
-        max_tokens=8192,
+        max_tokens=2048,
     )
