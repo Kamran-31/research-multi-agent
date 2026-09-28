@@ -17,5 +17,5 @@ def get_llm() -> LLM:
     return LLM(
         model=f"groq/{MODEL_NAME}",
         temperature=0.1,
-        max_tokens=1800,
+        max_tokens=1000,
     )
