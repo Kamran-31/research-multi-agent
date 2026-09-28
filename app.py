@@ -1263,7 +1263,7 @@ mode_data = [
     (
         "Standard",
         "Balanced research",
-        "Web, academic and industry evidence.",
+        "Web, academic and industry relevant evidences.",
     ),
     (
         "Deep",
