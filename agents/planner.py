@@ -1,5 +1,4 @@
 from crewai import Agent
-
 from config.llm import get_llm
 
 
@@ -7,15 +6,15 @@ def create_planner() -> Agent:
     return Agent(
         role="Research Planning Specialist",
         goal=(
-            "Turn the user's research question into a precise evidence-oriented "
-            "research plan with clear subquestions and source requirements."
+            "Convert the user's question into a concise research plan "
+            "with focused subquestions and evidence requirements."
         ),
         backstory=(
-            "You are a senior research strategist. You break broad questions "
-            "into focused investigative areas and define what evidence the "
-            "research team needs to establish."
+            "You are a research strategist. You identify the exact questions "
+            "that need to be answered and the evidence required to answer them."
         ),
         llm=get_llm(),
         allow_delegation=False,
+        max_iter=1,
         verbose=False,
     )
