@@ -1,19 +1,17 @@
 from crewai import Agent
 from config.llm import get_llm
-from tools.web_search import web_search_tool
 
 
 def create_industry_researcher() -> Agent:
     return Agent(
         role="Industry Research Specialist",
-        goal="Identify concise evidence about real-world industry adoption.",
+        goal="Analyze supplied industry evidence and extract important real-world findings.",
         backstory=(
-            "You investigate companies, products, deployments, "
-            "market activity and practical implementations."
+            "You investigate companies, products, deployments and adoption "
+            "using supplied evidence."
         ),
-        tools=[web_search_tool],
         llm=get_llm(650),
         allow_delegation=False,
-        max_iter=2,
+        max_iter=1,
         verbose=False,
     )
