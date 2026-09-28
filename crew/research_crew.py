@@ -1,4 +1,5 @@
 import os
+import time
 
 from crewai import Crew, Process
 
@@ -27,11 +28,21 @@ class ResearchCrew:
             "synthesizer": create_synthesizer(),
         }
 
+    def get_result_limit(self, depth: str) -> int:
+
+        limits = {
+            "Quick": 2,
+            "Standard": 3,
+            "Deep": 5,
+        }
+
+        return limits.get(depth, 3)
+
     def run(
         self,
         question: str,
         depth: str = "Standard",
-        max_results: int = 5,
+        max_results: int = 3,
     ) -> str:
 
         if not os.getenv("GROQ_API_KEY"):
@@ -39,11 +50,18 @@ class ResearchCrew:
                 "GROQ_API_KEY is missing."
             )
 
+        result_limit = self.get_result_limit(depth)
+
+        # Make the limit available to the search tools.
+        os.environ["RESEARCH_MAX_RESULTS"] = str(
+            result_limit
+        )
+
         tasks = create_tasks(
             agents=self.agents,
             question=question,
             depth=depth,
-            max_results=max_results,
+            max_results=result_limit,
         )
 
         crew = Crew(
@@ -53,9 +71,36 @@ class ResearchCrew:
             verbose=False,
         )
 
-        result = crew.kickoff()
+        last_error = None
 
-        if hasattr(result, "raw"):
-            return result.raw
+        # One controlled retry for a temporary Groq rate limit.
+        for attempt in range(2):
 
-        return str(result)
+            try:
+
+                result = crew.kickoff()
+
+                if hasattr(result, "raw"):
+                    return result.raw
+
+                return str(result)
+
+            except Exception as exc:
+
+                last_error = exc
+
+                error_text = str(exc).lower()
+
+                if (
+                    "ratelimit" not in error_text
+                    and "rate limit" not in error_text
+                    and "429" not in error_text
+                ):
+                    raise
+
+                if attempt == 0:
+                    time.sleep(7)
+                else:
+                    raise last_error
+
+        raise last_error
