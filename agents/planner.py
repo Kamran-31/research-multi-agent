@@ -7,7 +7,7 @@ def create_planner() -> Agent:
         role="Research Planning Specialist",
         goal="Create a concise research plan.",
         backstory="You turn a research question into focused subquestions.",
-        llm=get_llm(400),
+        llm=get_llm(600),
         allow_delegation=False,
         max_iter=1,
         verbose=False,
