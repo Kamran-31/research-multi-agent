@@ -2,224 +2,182 @@ from crewai import Task
 
 
 def create_tasks(
-    agents: dict,
-    question: str,
-    depth: str,
-    max_results: int,
-    web_evidence: str = "",
-    academic_evidence: str = "",
-    industry_evidence: str = "",
-) -> list[Task]:
+    agents,
+    question,
+    web_evidence,
+    academic_evidence,
+    industry_evidence,
+):
 
     planner = Task(
         description=f"""
-Create a compact research plan for:
+Research question:
 
 {question}
 
-Research depth: {depth}
+Create a research plan.
 
 Return:
-
 Objective:
 Subquestions:
-- ...
-- ...
-- ...
-- ...
+1.
+2.
+3.
+4.
 
-Evidence needed:
-
-Maximum 150 words.
+Maximum 120 words.
 """,
-        expected_output="A concise research plan.",
+        expected_output="Compact research plan.",
         agent=agents["planner"],
     )
 
     web = Task(
         description=f"""
-Analyze the following web research collected for this question:
-
-QUESTION:
+Question:
 {question}
 
-WEB EVIDENCE:
+Web evidence collected externally:
+
 {web_evidence}
 
-Identify the most relevant findings.
+Extract only the 3 most important findings.
 
-For each finding:
-
+For each:
 Finding:
-Evidence:
 Source:
 URL:
 
-Maximum {max_results} findings.
-Maximum 300 words.
-
-Do not search the web.
-Do not invent information.
+Maximum 220 words.
+Do not search for anything.
 """,
-        expected_output="A concise web evidence dossier.",
+        expected_output="Three concise web findings.",
         agent=agents["web_researcher"],
         context=[planner],
     )
 
     academic = Task(
         description=f"""
-Analyze the following academic research collected for this question:
-
-QUESTION:
+Question:
 {question}
 
-ACADEMIC EVIDENCE:
+Academic evidence collected externally:
+
 {academic_evidence}
 
-Identify the most relevant scholarly findings.
+Extract only the 3 most important findings.
 
 For each:
-
 Finding:
 Paper:
 Year:
-URL/DOI:
-Limitation:
+URL:
 
-Maximum {max_results} works.
-Maximum 300 words.
-
-Do not search the web.
-Do not invent papers.
+Maximum 220 words.
+Do not search for anything.
 """,
-        expected_output="A concise academic evidence dossier.",
+        expected_output="Three concise academic findings.",
         agent=agents["academic_researcher"],
         context=[planner],
     )
 
     industry = Task(
         description=f"""
-Analyze the following industry research collected for this question:
-
-QUESTION:
+Question:
 {question}
 
-INDUSTRY EVIDENCE:
+Industry evidence collected externally:
+
 {industry_evidence}
 
-Identify the most relevant findings.
+Extract only the 3 most important findings.
 
 For each:
-
 Finding:
-Evidence:
 Organization:
+Evidence:
 URL:
 
-Maximum {max_results} findings.
-Maximum 300 words.
-
-Clearly distinguish company claims from independent evidence.
-
-Do not search the web.
-Do not invent information.
+Maximum 220 words.
+Do not search for anything.
 """,
-        expected_output="A concise industry evidence dossier.",
+        expected_output="Three concise industry findings.",
         agent=agents["industry_researcher"],
         context=[planner],
     )
 
     evidence = Task(
         description="""
-Analyze the three research dossiers.
+Compare the research findings.
 
-Create a compact evidence map.
+Identify the 4 most important claims.
 
-For each major claim:
+For each:
 
 Claim:
-Supporting Evidence:
+Evidence:
 Sources:
-Agreement/Conflict:
-Evidence Strength:
+Status:
 Gap:
 
-Maximum 5 major claims.
-Maximum 450 words.
-
-Do not introduce outside information.
+Maximum 350 words.
+Use ONLY supplied evidence.
 """,
-        expected_output="A compact evidence map.",
+        expected_output="Compact evidence map.",
         agent=agents["evidence_analyst"],
         context=[web, academic, industry],
     )
 
     fact_check = Task(
         description="""
-Evaluate the important claims in the evidence map against the
-research dossiers supplied earlier.
+Check the evidence map against the supplied research findings.
 
-For each important claim:
+Return:
 
 Claim:
 Status:
-Supporting Evidence:
+Reason:
 Source:
 
-Status must be one of:
-
+Use only:
 Confirmed
 Partially supported
 Conflicting
 Unverified
 
-Maximum 5 checks.
-Maximum 400 words.
-
+Maximum 300 words.
 Do not perform external searches.
-Do not invent verification evidence.
 """,
-        expected_output="A concise fact-check dossier.",
+        expected_output="Compact fact-check.",
         agent=agents["fact_checker"],
         context=[web, academic, industry, evidence],
     )
 
     synthesis = Task(
         description=f"""
-Write the final research report for:
+Write the final research report.
 
+Question:
 {question}
 
-Use ONLY the supplied evidence map and fact-check results.
+Use only the evidence map and fact-check.
 
 Structure:
 
 # Executive Summary
-
 # Key Findings
-
 # Evidence Analysis
-
 # Risks and Uncertainty
-
 # Practical Implications
-
 # Conclusion
-
 # Sources
 
-Rules:
+Do not invent facts.
+Do not invent statistics.
+Do not invent sources.
 
-- Do not invent facts.
-- Do not invent statistics.
-- Do not invent sources.
-- Do not invent quotations.
-- Preserve contradictions.
-- Clearly identify unverified claims.
-- Include source URLs.
-- Maximum 800 words.
+Maximum 700 words.
 """,
-        expected_output="A concise evidence-based research report.",
+        expected_output="Final research report.",
         agent=agents["synthesizer"],
         context=[evidence, fact_check],
     )
