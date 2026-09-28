@@ -1,26 +1,19 @@
 from crewai import Agent
 from config.llm import get_llm
 from tools.web_search import web_search_tool
-from tools.web_extract import extract_webpage_tool
 
 
 def create_web_researcher() -> Agent:
     return Agent(
         role="Web Research Specialist",
-        goal=(
-            "Find concise, current and authoritative web evidence "
-            "for the assigned research questions."
-        ),
+        goal="Find concise, reliable current web evidence.",
         backstory=(
-            "You are an investigative web researcher. You prioritize official "
-            "sources, primary sources, institutions and reputable reporting."
+            "You investigate official sources, institutions, "
+            "primary sources and reputable reporting."
         ),
-        tools=[
-            web_search_tool,
-            extract_webpage_tool,
-        ],
-        llm=get_llm(),
+        tools=[web_search_tool],
+        llm=get_llm(650),
         allow_delegation=False,
-        max_iter=3,
+        max_iter=2,
         verbose=False,
     )
