@@ -4,16 +4,13 @@ from config.llm import get_llm
 
 def create_synthesizer() -> Agent:
     return Agent(
-        role="Senior Research Report Synthesizer",
-        goal=(
-            "Produce a clear, concise and source-grounded research report "
-            "using only the verified evidence provided."
-        ),
+        role="Research Report Synthesizer",
+        goal="Produce a concise evidence-based research report.",
         backstory=(
-            "You are a senior research writer. You synthesize evidence, "
-            "preserve uncertainty and never invent facts or sources."
+            "You transform verified research evidence into a clear, "
+            "professional research report without inventing information."
         ),
-        llm=get_llm(),
+        llm=get_llm(1100),
         allow_delegation=False,
         max_iter=1,
         verbose=False,
