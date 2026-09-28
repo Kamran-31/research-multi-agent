@@ -1,19 +1,18 @@
 from crewai import Agent
 from config.llm import get_llm
-from tools.academic_search import academic_search_tool
 
 
 def create_academic_researcher() -> Agent:
     return Agent(
         role="Academic Research Specialist",
-        goal="Find the most relevant scholarly evidence.",
+        goal="Analyze supplied academic evidence and extract the most relevant findings.",
         backstory=(
-            "You search academic literature and identify useful "
-            "research findings while avoiding unnecessary detail."
+            "You are an academic research analyst. "
+            "You evaluate scholarly evidence and identify useful findings "
+            "while clearly noting limitations."
         ),
-        tools=[academic_search_tool],
         llm=get_llm(650),
         allow_delegation=False,
-        max_iter=2,
+        max_iter=1,
         verbose=False,
     )
