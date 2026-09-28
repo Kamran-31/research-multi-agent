@@ -1,4 +1,5 @@
 import os
+import re
 import time
 
 from crewai import Crew, Process
@@ -33,16 +34,38 @@ class ResearchCrew:
         limits = {
             "Quick": 2,
             "Standard": 3,
-            "Deep": 5,
+            "Deep": 4,
         }
 
         return limits.get(depth, 3)
+
+    def extract_wait_time(self, error_text: str) -> float:
+
+        patterns = [
+            r"try again in ([0-9.]+)s",
+            r"retry.after.*?([0-9.]+)",
+        ]
+
+        for pattern in patterns:
+
+            match = re.search(
+                pattern,
+                error_text.lower()
+            )
+
+            if match:
+                try:
+                    return float(match.group(1))
+                except ValueError:
+                    pass
+
+        return 8.0
 
     def run(
         self,
         question: str,
         depth: str = "Standard",
-        max_results: int = 3,
+        max_results: int = 3
     ) -> str:
 
         if not os.getenv("GROQ_API_KEY"):
@@ -52,7 +75,6 @@ class ResearchCrew:
 
         result_limit = self.get_result_limit(depth)
 
-        # Make the limit available to the search tools.
         os.environ["RESEARCH_MAX_RESULTS"] = str(
             result_limit
         )
@@ -71,10 +93,9 @@ class ResearchCrew:
             verbose=False,
         )
 
-        last_error = None
+        max_attempts = 3
 
-        # One controlled retry for a temporary Groq rate limit.
-        for attempt in range(2):
+        for attempt in range(max_attempts):
 
             try:
 
@@ -87,20 +108,37 @@ class ResearchCrew:
 
             except Exception as exc:
 
-                last_error = exc
+                error_text = str(exc)
 
-                error_text = str(exc).lower()
+                is_rate_limit = (
+                    "ratelimit" in error_text.lower()
+                    or "rate limit" in error_text.lower()
+                    or "429" in error_text
+                    or "tokens per minute" in error_text.lower()
+                )
 
-                if (
-                    "ratelimit" not in error_text
-                    and "rate limit" not in error_text
-                    and "429" not in error_text
-                ):
+                if not is_rate_limit:
                     raise
 
-                if attempt == 0:
-                    time.sleep(7)
-                else:
-                    raise last_error
+                if attempt == max_attempts - 1:
+                    raise RuntimeError(
+                        "The research workflow exceeded the "
+                        "current Groq token-per-minute limit. "
+                        "Please wait about one minute and try again."
+                    ) from exc
 
-        raise last_error
+                wait_time = self.extract_wait_time(
+                    error_text
+                )
+
+                # Add a small safety buffer.
+                wait_time = max(
+                    wait_time + 2,
+                    5
+                )
+
+                time.sleep(wait_time)
+
+        raise RuntimeError(
+            "Research workflow could not be completed."
+        )
