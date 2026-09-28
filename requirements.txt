@@ -1,0 +1,5 @@
+crewai[litellm]==1.15.22
+groq
+streamlit==1.64.0
+tavily-python==0.8.4
+requests
