@@ -1,4 +1,3 @@
-```python
 import os
 import html
 import streamlit as st
@@ -1710,4 +1709,3 @@ st.html(
     </div>
     """
 )
-```
