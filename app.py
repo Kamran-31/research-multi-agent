@@ -1006,10 +1006,16 @@ with st.sidebar:
     if "research_depth" not in st.session_state:
         st.session_state.research_depth = "Standard"
 
+    if "selected_mode" in st.session_state:
+        st.session_state.research_depth = st.session_state.selected_mode
+        del st.session_state.selected_mode
+    
     research_depth = st.selectbox(
         "Research depth",
         ["Quick", "Standard", "Deep"],
-        key="research_depth",
+        index=["Quick", "Standard", "Deep"].index(
+            st.session_state.research_depth
+        ),
         label_visibility="collapsed",
     )
 
@@ -1397,7 +1403,7 @@ for col, (name, subtitle, description) in zip(
         )
 
         if clicked:
-            st.session_state.research_depth = name
+            st.session_state.selected_mode = name
             st.rerun()
 
 
