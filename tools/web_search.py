@@ -15,39 +15,51 @@ def get_tavily_client() -> TavilyClient:
 
 @tool("web_search")
 def web_search_tool(query: str) -> str:
-    """Search the web and return relevant titles, URLs and evidence snippets."""
+    """Search the web and return concise source evidence."""
 
     query = query.strip()
 
     if not query:
         return "No search query was provided."
 
-    client = get_tavily_client()
-
-    response = client.search(
-        query=query,
-        search_depth="advanced",
-        max_results=6,
-        include_answer=False,
-        include_raw_content=False,
-    )
-
-    results = response.get("results", [])
-
-    if not results:
-        return "No web results were found."
-
-    output = ["WEB SEARCH RESULTS"]
-
-    for index, result in enumerate(results, start=1):
-        output.append(
-            f"""
-SOURCE {index}
-Title: {result.get("title", "Untitled")}
-URL: {result.get("url", "")}
-Evidence:
-{result.get("content", "")}
-"""
+    try:
+        max_results = int(
+            os.getenv("RESEARCH_MAX_RESULTS", "4")
         )
 
-    return "\n".join(output)
+        client = get_tavily_client()
+
+        response = client.search(
+            query=query,
+            search_depth="basic",
+            max_results=max_results,
+            include_answer=False,
+            include_raw_content=False,
+        )
+
+        results = response.get("results", [])
+
+        if not results:
+            return "No web results were found."
+
+        output = ["WEB SEARCH RESULTS"]
+
+        for index, result in enumerate(results, start=1):
+            title = result.get("title", "Untitled")
+            url = result.get("url", "")
+            content = result.get("content", "")
+
+            output.append(
+                f"""
+SOURCE {index}
+Title: {title}
+URL: {url}
+Evidence:
+{content[:1200]}
+"""
+            )
+
+        return "\n".join(output)
+
+    except Exception as exc:
+        return f"Web search failed: {str(exc)}"
