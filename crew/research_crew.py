@@ -1,6 +1,6 @@
 import os
-import re
 import time
+import re
 
 from crewai import Crew, Process
 
@@ -13,6 +13,9 @@ from agents.fact_checker import create_fact_checker
 from agents.synthesizer import create_synthesizer
 
 from tasks.research_tasks import create_tasks
+
+from tools.web_search import web_search_tool
+from tools.academic_search import academic_search_tool
 
 
 class ResearchCrew:
@@ -31,35 +34,70 @@ class ResearchCrew:
 
     def get_result_limit(self, depth: str) -> int:
 
-        limits = {
+        return {
             "Quick": 2,
             "Standard": 3,
             "Deep": 4,
-        }
-
-        return limits.get(depth, 3)
+        }.get(depth, 3)
 
     def extract_wait_time(self, error_text: str) -> float:
 
-        patterns = [
+        match = re.search(
             r"try again in ([0-9.]+)s",
-            r"retry.after.*?([0-9.]+)",
-        ]
+            error_text.lower()
+        )
 
-        for pattern in patterns:
+        if match:
+            return float(match.group(1)) + 2
 
-            match = re.search(
-                pattern,
-                error_text.lower()
-            )
+        return 8
 
-            if match:
-                try:
-                    return float(match.group(1))
-                except ValueError:
-                    pass
+    def collect_web_evidence(
+        self,
+        question: str,
+        limit: int
+    ) -> str:
 
-        return 8.0
+        os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
+
+        result = web_search_tool.run(
+            question
+        )
+
+        return str(result)[:5000]
+
+    def collect_academic_evidence(
+        self,
+        question: str,
+        limit: int
+    ) -> str:
+
+        os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
+
+        result = academic_search_tool.run(
+            question
+        )
+
+        return str(result)[:5000]
+
+    def collect_industry_evidence(
+        self,
+        question: str,
+        limit: int
+    ) -> str:
+
+        os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
+
+        industry_query = (
+            f"{question} companies products "
+            f"industry adoption implementation"
+        )
+
+        result = web_search_tool.run(
+            industry_query
+        )
+
+        return str(result)[:5000]
 
     def run(
         self,
@@ -75,15 +113,37 @@ class ResearchCrew:
 
         result_limit = self.get_result_limit(depth)
 
-        os.environ["RESEARCH_MAX_RESULTS"] = str(
+        # --------------------------------------------------
+        # 1. Collect external evidence outside the LLM.
+        # --------------------------------------------------
+
+        web_evidence = self.collect_web_evidence(
+            question,
             result_limit
         )
+
+        academic_evidence = self.collect_academic_evidence(
+            question,
+            result_limit
+        )
+
+        industry_evidence = self.collect_industry_evidence(
+            question,
+            result_limit
+        )
+
+        # --------------------------------------------------
+        # 2. Build LLM tasks with collected evidence.
+        # --------------------------------------------------
 
         tasks = create_tasks(
             agents=self.agents,
             question=question,
             depth=depth,
             max_results=result_limit,
+            web_evidence=web_evidence,
+            academic_evidence=academic_evidence,
+            industry_evidence=industry_evidence,
         )
 
         crew = Crew(
@@ -92,6 +152,10 @@ class ResearchCrew:
             process=Process.sequential,
             verbose=False,
         )
+
+        # --------------------------------------------------
+        # 3. Run the seven-agent analysis pipeline.
+        # --------------------------------------------------
 
         max_attempts = 3
 
@@ -122,22 +186,17 @@ class ResearchCrew:
 
                 if attempt == max_attempts - 1:
                     raise RuntimeError(
-                        "The research workflow exceeded the "
-                        "current Groq token-per-minute limit. "
-                        "Please wait about one minute and try again."
+                        "The research workflow could not be "
+                        "completed because the Groq rate limit "
+                        "was reached. Please wait and try again."
                     ) from exc
 
-                wait_time = self.extract_wait_time(
-                    error_text
+                time.sleep(
+                    max(
+                        self.extract_wait_time(error_text),
+                        5
+                    )
                 )
-
-                # Add a small safety buffer.
-                wait_time = max(
-                    wait_time + 2,
-                    5
-                )
-
-                time.sleep(wait_time)
 
         raise RuntimeError(
             "Research workflow could not be completed."
