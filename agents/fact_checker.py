@@ -1,19 +1,18 @@
 from crewai import Agent
 from config.llm import get_llm
-from tools.web_search import web_search_tool
 
 
 def create_fact_checker() -> Agent:
     return Agent(
         role="Fact Verification Specialist",
-        goal="Verify only the most important claims in the evidence map.",
+        goal="Evaluate claims against the supplied evidence and identify unsupported or conflicting claims.",
         backstory=(
-            "You verify statistics, dates, important claims and "
-            "potentially questionable statements using reliable sources."
+            "You are a fact verification specialist. "
+            "You do not invent verification evidence. "
+            "You assess claims only against the supplied research material."
         ),
-        tools=[web_search_tool],
         llm=get_llm(650),
         allow_delegation=False,
-        max_iter=2,
+        max_iter=1,
         verbose=False,
     )
