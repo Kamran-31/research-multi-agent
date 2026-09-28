@@ -32,115 +32,68 @@ class ResearchCrew:
             "synthesizer": create_synthesizer(),
         }
 
-    def get_result_limit(self, depth: str) -> int:
+    def get_limit(self, depth):
 
         return {
             "Quick": 2,
-            "Standard": 3,
-            "Deep": 4,
-        }.get(depth, 3)
+            "Standard": 2,
+            "Deep": 3,
+        }.get(depth, 2)
 
-    def extract_wait_time(self, error_text: str) -> float:
-
-        match = re.search(
-            r"try again in ([0-9.]+)s",
-            error_text.lower()
-        )
-
-        if match:
-            return float(match.group(1)) + 2
-
-        return 8
-
-    def collect_web_evidence(
-        self,
-        question: str,
-        limit: int
-    ) -> str:
+    def search_web(self, query, limit):
 
         os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
 
-        result = web_search_tool.run(
-            question
-        )
+        result = web_search_tool.run(query)
 
-        return str(result)[:5000]
+        return str(result)[:3500]
 
-    def collect_academic_evidence(
-        self,
-        question: str,
-        limit: int
-    ) -> str:
+    def search_academic(self, query, limit):
 
         os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
 
-        result = academic_search_tool.run(
-            question
-        )
+        result = academic_search_tool.run(query)
 
-        return str(result)[:5000]
-
-    def collect_industry_evidence(
-        self,
-        question: str,
-        limit: int
-    ) -> str:
-
-        os.environ["RESEARCH_MAX_RESULTS"] = str(limit)
-
-        industry_query = (
-            f"{question} companies products "
-            f"industry adoption implementation"
-        )
-
-        result = web_search_tool.run(
-            industry_query
-        )
-
-        return str(result)[:5000]
+        return str(result)[:3000]
 
     def run(
         self,
-        question: str,
-        depth: str = "Standard",
-        max_results: int = 3
-    ) -> str:
+        question,
+        depth="Standard",
+        max_results=2,
+    ):
 
         if not os.getenv("GROQ_API_KEY"):
-            raise RuntimeError(
-                "GROQ_API_KEY is missing."
-            )
+            raise RuntimeError("GROQ_API_KEY is missing.")
 
-        result_limit = self.get_result_limit(depth)
+        limit = self.get_limit(depth)
 
-        # --------------------------------------------------
-        # 1. Collect external evidence outside the LLM.
-        # --------------------------------------------------
+        # -----------------------------------------
+        # External research happens WITHOUT Groq.
+        # -----------------------------------------
 
-        web_evidence = self.collect_web_evidence(
+        web_evidence = self.search_web(
             question,
-            result_limit
+            limit,
         )
 
-        academic_evidence = self.collect_academic_evidence(
+        academic_evidence = self.search_academic(
             question,
-            result_limit
+            limit,
         )
 
-        industry_evidence = self.collect_industry_evidence(
-            question,
-            result_limit
+        industry_evidence = self.search_web(
+            f"{question} companies products adoption implementation",
+            limit,
         )
 
-        # --------------------------------------------------
-        # 2. Build LLM tasks with collected evidence.
-        # --------------------------------------------------
+        # -----------------------------------------
+        # Create compact agent tasks.
+        # -----------------------------------------
 
         tasks = create_tasks(
             agents=self.agents,
             question=question,
-            depth=depth,
-            max_results=result_limit,
             web_evidence=web_evidence,
             academic_evidence=academic_evidence,
             industry_evidence=industry_evidence,
@@ -153,13 +106,11 @@ class ResearchCrew:
             verbose=False,
         )
 
-        # --------------------------------------------------
-        # 3. Run the seven-agent analysis pipeline.
-        # --------------------------------------------------
+        # -----------------------------------------
+        # Run with a small number of retries.
+        # -----------------------------------------
 
-        max_attempts = 3
-
-        for attempt in range(max_attempts):
+        for attempt in range(2):
 
             try:
 
@@ -172,32 +123,38 @@ class ResearchCrew:
 
             except Exception as exc:
 
-                error_text = str(exc)
+                error = str(exc).lower()
 
-                is_rate_limit = (
-                    "ratelimit" in error_text.lower()
-                    or "rate limit" in error_text.lower()
-                    or "429" in error_text
-                    or "tokens per minute" in error_text.lower()
+                rate_limit = (
+                    "rate limit" in error
+                    or "ratelimit" in error
+                    or "429" in error
+                    or "tokens per minute" in error
                 )
 
-                if not is_rate_limit:
+                if not rate_limit:
                     raise
 
-                if attempt == max_attempts - 1:
+                if attempt == 1:
                     raise RuntimeError(
-                        "The research workflow could not be "
-                        "completed because the Groq rate limit "
-                        "was reached. Please wait and try again."
+                        "Groq's token-per-minute limit was reached. "
+                        "Please wait approximately one minute and "
+                        "run the research again."
                     ) from exc
 
-                time.sleep(
-                    max(
-                        self.extract_wait_time(error_text),
-                        5
-                    )
+                match = re.search(
+                    r"try again in ([0-9.]+)s",
+                    error,
                 )
 
+                wait = (
+                    float(match.group(1)) + 3
+                    if match
+                    else 10
+                )
+
+                time.sleep(wait)
+
         raise RuntimeError(
-            "Research workflow could not be completed."
+            "Research workflow failed."
         )
