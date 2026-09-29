@@ -22,7 +22,7 @@ def get_llm() -> LLM:
         temperature=0.2,
 
         # Keep every individual completion bounded.
-        max_tokens=600,
+        max_tokens=1200,
 
         # GPT-OSS supports low reasoning effort.
         reasoning_effort="low",
