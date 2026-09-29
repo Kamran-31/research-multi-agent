@@ -4,7 +4,7 @@ import streamlit as st
 
 from crew.research_crew import ResearchCrew
 from utils.formatting import clean_markdown, extract_sources
-
+from utils.pdf_generator import create_pdf
 
 # ============================================================
 # ENVIRONMENT
@@ -1002,11 +1002,6 @@ st.html(
         box-shadow: none !important;
     }
 
-    /* Question textarea fix */
-    div[data-testid="stTextArea"] {
-        width: 100%;
-    )
-
 
     /* Mobile pipeline fix */
     @media (max-width: 768px) {
@@ -1860,6 +1855,20 @@ if start_research:
                 </div>
             </div>
             """
+        )
+
+        # Generate downloadable PDF report
+        pdf_file = create_pdf(
+            report_markdown=result,
+            question=question.strip(),
+        )
+
+        st.download_button(
+            label="Download PDF Report",
+            data=pdf_file.getvalue(),
+            file_name="Research Intelligence.pdf",
+            mime="application/pdf",
+            use_container_width=True,
         )
 
         # ----------------------------------------------------
