@@ -3,3 +3,4 @@ groq
 streamlit==1.64.0
 tavily-python==0.8.4
 requests
+reportlab
