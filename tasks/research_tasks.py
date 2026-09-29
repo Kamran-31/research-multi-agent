@@ -243,42 +243,87 @@ def fact_check_task(
     return create_task(
         agent=agent,
         description=f"""
-You are the Fact Checking Specialist.
+You are the Fact Checker for a multi-agent research system.
 
 Research question:
 {question}
 
-Evidence map:
-
+EVIDENCE ANALYSIS:
 {evidence_map}
 
-Check the most important claims.
+Your job is to verify the important claims identified by the Evidence Analyst.
 
-Focus on:
-- statistics
-- dates
-- numerical claims
-- company/product claims
-- controversial claims
-- claims with conflicting evidence
+For every important claim, determine:
 
-For each important claim classify it as:
+1. Does the cited source actually exist?
+2. Does the source actually support the claim?
+3. Is the claim stronger or more specific than the evidence?
+4. Is the source primary, peer-reviewed, secondary, vendor-provided, or otherwise limited?
+5. Are numerical/statistical claims explicitly supported?
+6. Are paper titles, authors, publication venues and dates consistent with the available evidence?
+7. Are there contradictions between sources?
+8. Is the claim verified, partially verified, unsupported, or unverified?
 
-Confirmed
-Partially supported
-Conflicting
-Unverified
+Use this verification classification:
 
-Explain the reason briefly.
+VERIFIED:
+The source exists and directly supports the claim.
 
-Do not invent verification sources.
-Do not write the final report.
+PARTIALLY VERIFIED:
+The source supports the general idea but not the full strength, number, scope, or wording of the claim.
 
-Keep the output compact.
+UNSUPPORTED:
+The available evidence does not support the claim.
+
+UNVERIFIED:
+The claim may be plausible, but the source/evidence cannot be adequately verified.
+
+IMPORTANT RULES:
+
+- Never invent a citation.
+- Never invent a paper title.
+- Never invent authors.
+- Never invent publication venues.
+- Never invent statistics.
+- Never upgrade a weak source into strong evidence.
+- Never treat a vendor marketing claim as independent evidence.
+- If a source does not explicitly support a numerical claim, mark that claim PARTIALLY VERIFIED or UNSUPPORTED.
+- If a citation cannot be verified from the supplied evidence, mark it UNVERIFIED.
+- Preserve uncertainty.
+- Do not "repair" missing evidence by guessing.
+- Do not introduce new unsupported facts.
+
+Return a concise verification report.
+
+Use this structure:
+
+# Verification Summary
+
+# Verified Claims
+
+# Partially Verified Claims
+
+# Unsupported or Unverified Claims
+
+# Citation Issues
+
+# Recommended Corrections
+
+For each important claim, include:
+
+- Claim
+- Verification status
+- Evidence/source
+- Reason
+- Required correction, if any
+
+Do not write the final research report.
+Your output is verification evidence for the Research Synthesizer.
 """,
         expected_output="""
-A concise verification table/list containing important claims,
-their status and verification reasoning.
+A concise fact-checking report that clearly classifies important claims as:
+VERIFIED, PARTIALLY VERIFIED, UNSUPPORTED, or UNVERIFIED,
+with source-based reasoning and recommended corrections.
 """,
     )
 
