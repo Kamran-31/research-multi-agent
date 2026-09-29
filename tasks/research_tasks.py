@@ -342,8 +342,11 @@ Rules:
 - Keep tables valid Markdown.
 - Use tables only when they materially improve clarity.
 - Prefer concise headings and bullet points for detailed evidence.
-- Complete every section before stopping.
-- Do not truncate the report.
+- Do not repeat the same finding in multiple sections.
+- Include only the most important findings.
+- Keep the report concise enough to fit the available output budget.
+- Every section must be completed.
+- Do not stop midway through a section.
 
 Write a professional research report.
 """,
