@@ -336,6 +336,14 @@ Rules:
 - Clearly distinguish company claims from independently supported findings.
 - Include source URLs available in the evidence.
 - Prefer conclusions supported by multiple evidence streams.
+- Use clean Markdown only.
+- Do not use HTML tags such as <br>, <div>, <span>, etc.
+- Do not escape HTML tags.
+- Keep tables valid Markdown.
+- Use tables only when they materially improve clarity.
+- Prefer concise headings and bullet points for detailed evidence.
+- Complete every section before stopping.
+- Do not truncate the report.
 
 Write a professional research report.
 """,
