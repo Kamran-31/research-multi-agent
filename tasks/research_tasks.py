@@ -376,22 +376,76 @@ Rules:
 - Do not invent facts.
 - Do not invent statistics.
 - Do not invent sources.
-- Do not treat unverified claims as established facts.
+- Do not invent paper titles, authors, journals, conferences, companies, benchmarks, or numerical results.
+- Use only evidence contained in the supplied research and fact-check results.
+- Treat VERIFIED claims as usable evidence.
+- Treat PARTIALLY VERIFIED claims cautiously and weaken their wording when necessary.
+- Do not present UNSUPPORTED or UNVERIFIED claims as established facts.
 - Preserve important contradictions.
-- Clearly distinguish company claims from independently supported findings.
-- Include source URLs available in the evidence.
-- Prefer conclusions supported by multiple evidence streams.
-- Use clean Markdown only.
-- Do not use HTML tags such as <br>, <div>, <span>, etc.
-- Do not escape HTML tags.
-- Keep tables valid Markdown.
-- Use tables only when they materially improve clarity.
-- Prefer concise headings and bullet points for detailed evidence.
+- Clearly distinguish company/vendor claims from independent evidence.
+- Do not give unsupported quantitative claims.
+- If an exact statistic cannot be verified, describe the finding qualitatively or omit it.
+- Prefer conclusions supported by multiple independent evidence streams.
 - Do not repeat the same finding in multiple sections.
-- Include only the most important findings.
-- Keep the report concise enough to fit the available output budget.
-- Every section must be completed.
-- Do not stop midway through a section.
+
+Report structure:
+
+# Executive Summary
+
+Write 1–2 concise paragraphs.
+
+# Key Findings
+
+Provide 5–7 important findings.
+
+Use a compact table with:
+Finding | Evidence Strength | Confidence
+
+# Evidence Analysis
+
+Provide only the most important cross-source comparisons.
+
+Use a maximum of 5 rows.
+
+Use:
+Claim | Evidence | Agreement / Divergence | Confidence
+
+# Risks and Uncertainty
+
+Summarize limitations, conflicting evidence, weak evidence, and important unknowns.
+
+# Practical Implications
+
+Explain what the findings mean for organizations, technical teams, and decision-makers.
+
+# Conclusion
+
+Provide a concise synthesis of the overall evidence.
+
+# Sources
+
+List the most important verified sources with their URLs.
+
+Completion rules:
+- Every section above MUST be completed.
+- Never stop after the Evidence Analysis section.
+- Do not produce unnecessarily long tables.
+- Keep table cells concise.
+- Prefer bullets over large paragraphs.
+- Maximum 7 key findings.
+- Maximum 5 evidence-analysis rows.
+- Keep the entire report concise enough to fit the available output budget.
+- Prioritize completing all sections over adding more detail.
+- Do not repeat evidence unnecessarily.
+
+Formatting rules:
+- Use clean Markdown only.
+- Do not use HTML tags.
+- Do not use <br>, <div>, <span>, or similar tags.
+- Do not escape HTML tags.
+- Keep Markdown tables valid.
+- Use tables only when they materially improve clarity.
+- Do not create extremely wide tables.
 
 Write a professional research report.
 """,
