@@ -1575,16 +1575,133 @@ if start_research:
     # STATUS
     # --------------------------------------------------------
 
-    st.html(
-        """
-        <div class="section-label">
-            04 · Live Workflow
-        </div>
-        """
-    )
+        st.html(
+    """
+    <div class="section-label">
+        04 · Live Workflow
+    </div>
+    """
+)
 
-    st.html(
-        """
+# Dynamic workflow status container
+workflow_status = st.empty()
+
+# Initial state
+workflow_status.html(
+    """
+    <div class="status-panel">
+
+        <div class="status-header">
+
+            <div class="status-title">
+                Research Team
+            </div>
+
+            <div class="status-live">
+                <span class="live-dot"></span>
+                PROCESSING
+            </div>
+
+        </div>
+
+        <div class="agent-row">
+            <div class="agent-number">01</div>
+            <div class="agent-name">Research Planner</div>
+            <div class="agent-state">Waiting</div>
+        </div>
+
+        <div class="agent-row">
+            <div class="agent-number">02</div>
+            <div class="agent-name">Web Researcher</div>
+            <div class="agent-state">Waiting</div>
+        </div>
+
+        <div class="agent-row">
+            <div class="agent-number">03</div>
+            <div class="agent-name">Academic Researcher</div>
+            <div class="agent-state">Waiting</div>
+        </div>
+
+        <div class="agent-row">
+            <div class="agent-number">04</div>
+            <div class="agent-name">Industry Researcher</div>
+            <div class="agent-state">Waiting</div>
+        </div>
+
+        <div class="agent-row">
+            <div class="agent-number">05</div>
+            <div class="agent-name">Evidence Analyst</div>
+            <div class="agent-state">Waiting</div>
+        </div>
+
+        <div class="agent-row">
+            <div class="agent-number">06</div>
+            <div class="agent-name">Fact Checker</div>
+            <div class="agent-state">Waiting</div>
+        </div>
+
+        <div class="agent-row">
+            <div class="agent-number">07</div>
+            <div class="agent-name">Research Synthesizer</div>
+            <div class="agent-state">Waiting</div>
+        </div>
+
+    </div>
+    """
+)
+
+
+def update_workflow_status(message):
+
+    statuses = {
+        1: ("Research Planner", "Planning"),
+        2: ("Web Researcher", "Gathering evidence"),
+        3: ("Academic Researcher", "Searching literature"),
+        4: ("Industry Researcher", "Analyzing industry"),
+        5: ("Evidence Analyst", "Comparing evidence"),
+        6: ("Fact Checker", "Verifying claims"),
+        7: ("Research Synthesizer", "Preparing report"),
+    }
+
+    active_agent = None
+
+    for number, (agent_name, state) in statuses.items():
+        if agent_name.lower() in message.lower():
+            active_agent = number
+            break
+
+    if "Collecting web evidence" in message:
+        active_agent = 2
+
+    elif "Collecting academic evidence" in message:
+        active_agent = 3
+
+    elif "Collecting industry evidence" in message:
+        active_agent = 4
+
+    rows = []
+
+    for number, (agent_name, state) in statuses.items():
+
+        if active_agent == number:
+            current_state = state
+        elif active_agent and number < active_agent:
+            current_state = "Completed"
+        else:
+            current_state = "Waiting"
+
+        rows.append(
+            f"""
+            <div class="agent-row">
+                <div class="agent-number">0{number}</div>
+                <div class="agent-name">{agent_name}</div>
+                <div class="agent-state">{current_state}</div>
+            </div>
+            """
+        )
+
+    workflow_status.html(
+        f"""
         <div class="status-panel">
 
             <div class="status-header">
@@ -1600,93 +1717,105 @@ if start_research:
 
             </div>
 
+            {''.join(rows)}
+
+        </div>
+        """
+    )
+
+
+progress = st.status(
+    "Agents are conducting the investigation...",
+    expanded=False,
+)
+
+try:
+
+    research_crew = ResearchCrew()
+
+    with progress:
+
+        def status_callback(message):
+
+            update_workflow_status(message)
+
+            st.write(message)
+
+        result = research_crew.run(
+            question=question.strip(),
+            depth=research_depth,
+            status_callback=status_callback,
+        )
+
+    # Final UI state
+    workflow_status.html(
+        """
+        <div class="status-panel">
+
+            <div class="status-header">
+
+                <div class="status-title">
+                    Research Team
+                </div>
+
+                <div class="status-live">
+                    <span class="live-dot"></span>
+                    COMPLETE
+                </div>
+
+            </div>
+
             <div class="agent-row">
                 <div class="agent-number">01</div>
                 <div class="agent-name">Research Planner</div>
-                <div class="agent-state">Planning</div>
+                <div class="agent-state">Completed</div>
             </div>
 
             <div class="agent-row">
                 <div class="agent-number">02</div>
                 <div class="agent-name">Web Researcher</div>
-                <div class="agent-state">Gathering evidence</div>
+                <div class="agent-state">Completed</div>
             </div>
 
             <div class="agent-row">
                 <div class="agent-number">03</div>
                 <div class="agent-name">Academic Researcher</div>
-                <div class="agent-state">Searching literature</div>
+                <div class="agent-state">Completed</div>
             </div>
 
             <div class="agent-row">
                 <div class="agent-number">04</div>
                 <div class="agent-name">Industry Researcher</div>
-                <div class="agent-state">Analyzing industry</div>
+                <div class="agent-state">Completed</div>
             </div>
 
             <div class="agent-row">
                 <div class="agent-number">05</div>
                 <div class="agent-name">Evidence Analyst</div>
-                <div class="agent-state">Comparing evidence</div>
+                <div class="agent-state">Completed</div>
             </div>
 
             <div class="agent-row">
                 <div class="agent-number">06</div>
                 <div class="agent-name">Fact Checker</div>
-                <div class="agent-state">Verifying claims</div>
+                <div class="agent-state">Completed</div>
             </div>
 
             <div class="agent-row">
                 <div class="agent-number">07</div>
                 <div class="agent-name">Research Synthesizer</div>
-                <div class="agent-state">Preparing report</div>
+                <div class="agent-state">Completed</div>
             </div>
 
         </div>
         """
     )
 
-    progress = st.status(
-        "Agents are conducting the investigation...",
+    progress.update(
+        label="Research completed successfully",
+        state="complete",
         expanded=False,
     )
-
-    try:
-
-        with progress:
-
-            st.write(
-                "Research Planner is structuring the investigation."
-            )
-
-            st.write(
-                "Research agents are gathering evidence."
-            )
-
-            st.write(
-                "Evidence Analyst is comparing findings."
-            )
-
-            st.write(
-                "Fact Checker is validating important claims."
-            )
-
-            st.write(
-                "Research Synthesizer is preparing the final report."
-            )
-
-            research_crew = ResearchCrew()
-
-            result = research_crew.run(
-                question=question.strip(),
-                depth=research_depth,
-            )
-
-        progress.update(
-            label="Research completed successfully",
-            state="complete",
-            expanded=False,
-        )
 
         # ----------------------------------------------------
         # REPORT
