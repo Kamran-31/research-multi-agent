@@ -4,7 +4,7 @@ from typing import Any
 
 from crewai import Agent, Crew, Process
 
-from config.llm import get_llm
+from config.llm import get_llm, get_synthesis_llm
 
 from tasks.research_tasks import (
     planner_task,
@@ -42,7 +42,7 @@ class ResearchCrew:
 
     def __init__(self):
         self.llm = get_llm()
-
+        self.synthesis_llm = get_synthesis_llm()
         self.agents = self._create_agents()
 
     # -----------------------------------------------------
@@ -136,7 +136,7 @@ class ResearchCrew:
                 "You are a senior research analyst who synthesizes "
                 "multi-source evidence into precise reports."
             ),
-            llm=self.llm,
+            llm=self.synthesis_llm,
             allow_delegation=False,
             max_iter=1,
             verbose=False,
