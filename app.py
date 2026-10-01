@@ -32,15 +32,19 @@ if "research_data" not in st.session_state:
 if "is_running" not in st.session_state:
     st.session_state.is_running = False
 
+if "user_question" not in st.session_state:
+    st.session_state.user_question = ""
+
 
 def set_mode(mode_name: str):
     st.session_state.research_depth = mode_name
 
 
 def reset_investigation():
-    """Resets the state to start a clean new research query."""
+    """Resets all state to start a clean new research query."""
     st.session_state.research_data = None
     st.session_state.is_running = False
+    st.session_state.user_question = ""
 
 
 # ============================================================
@@ -1282,16 +1286,9 @@ st.html(
     """
 )
 
-# Bind text area to last investigated question if report exists, otherwise allow fresh input
-default_question_text = (
-    st.session_state.research_data["question"]
-    if st.session_state.research_data
-    else ""
-)
-
 question = st.text_area(
     "Research question",
-    value=default_question_text,
+    key="user_question",
     placeholder=(
         "Ask a research question...\n\n"
         "Example: What are the major opportunities, risks and "
@@ -1470,7 +1467,6 @@ for col, (name, subtitle, description) in zip(
 st.html("<div style='height:18px'></div>")
 
 if st.session_state.research_data:
-    # If a report is actively shown, offer a 2-column layout: Run New vs Reset
     col_run, col_reset = st.columns([3, 1])
     with col_run:
         start_research = st.button(
@@ -1620,10 +1616,8 @@ if start_research:
         """
     )
 
-    # Dynamic workflow status container
     workflow_status = st.empty()
 
-    # Initial state
     workflow_status.html(
         """
         <div class="status-panel">
@@ -1689,9 +1683,7 @@ if start_research:
 
     def update_workflow_status(event_or_message):
         """
-        Accepts either a structured dictionary event:
-          {'step': 2, 'state': 'Gathering web data'}
-        OR standard text strings with intelligent keyword mapping.
+        Accepts structured dictionary events or plain string fallbacks with keyword matching.
         """
         statuses = {
             1: ("Research Planner", "Planning"),
@@ -1706,12 +1698,10 @@ if start_research:
         active_agent = None
         custom_state_label = None
 
-        # 1. Check for structured dict event from ResearchCrew
         if isinstance(event_or_message, dict):
             active_agent = event_or_message.get("step")
             custom_state_label = event_or_message.get("state")
 
-        # 2. String fallback with resilient keyword matching
         elif isinstance(event_or_message, str):
             msg_lower = event_or_message.lower()
             keyword_map = [
@@ -1767,7 +1757,6 @@ if start_research:
         expanded=False,
     )
 
-    # 1. Turn on the flag right before starting the run
     st.session_state.is_running = True
 
     try:
@@ -1781,7 +1770,9 @@ if start_research:
             def status_callback(message):
                 update_workflow_status(message)
                 if isinstance(message, dict):
-                    st.write(f"**Step {message.get('step')}:** {message.get('state', '')}")
+                    st.write(
+                        f"**Step {message.get('step')}:** {message.get('state', '')}"
+                    )
                 else:
                     st.write(message)
 
@@ -1917,111 +1908,6 @@ if start_research:
 
     finally:
         st.session_state.is_running = False
-
-        # Final UI state
-        workflow_status.html(
-            """
-            <div class="status-panel">
-
-                <div class="status-header">
-
-                    <div class="status-title">
-                        Research Team
-                    </div>
-
-                    <div class="status-live">
-                        <span class="live-dot"></span>
-                        COMPLETE
-                    </div>
-
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">01</div>
-                    <div class="agent-name">Research Planner</div>
-                    <div class="agent-state">Completed</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">02</div>
-                    <div class="agent-name">Web Researcher</div>
-                    <div class="agent-state">Completed</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">03</div>
-                    <div class="agent-name">Academic Researcher</div>
-                    <div class="agent-state">Completed</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">04</div>
-                    <div class="agent-name">Industry Researcher</div>
-                    <div class="agent-state">Completed</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">05</div>
-                    <div class="agent-name">Evidence Analyst</div>
-                    <div class="agent-state">Completed</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">06</div>
-                    <div class="agent-name">Fact Checker</div>
-                    <div class="agent-state">Completed</div>
-                </div>
-
-                <div class="agent-row">
-                    <div class="agent-number">07</div>
-                    <div class="agent-name">Research Synthesizer</div>
-                    <div class="agent-state">Completed</div>
-                </div>
-
-            </div>
-            """
-        )
-
-        progress.update(
-            label="Research completed successfully",
-            state="complete",
-            expanded=False,
-        )
-
-     except Exception as exc:
-
-        progress.update(
-            label="Research could not be completed",
-            state="error",
-            expanded=False,
-        )
-
-        error_text = str(exc)
-
-        if (
-            "rate_limit" in error_text.lower()
-            or "ratelimit" in error_text.lower()
-            or "429" in error_text
-        ):
-
-            st.error(
-                "The research workflow reached the current "
-                "Groq token-per-minute limit."
-            )
-
-            st.info(
-                "Try Quick research after the current "
-                "rate-limit window resets."
-            )
-
-        else:
-
-            st.error(
-                "The research workflow could not be completed."
-            )
-
-        with st.expander("Technical details"):
-            st.code(error_text)
 
 
 # ============================================================
