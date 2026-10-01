@@ -29,9 +29,18 @@ if "research_depth" not in st.session_state:
 if "research_data" not in st.session_state:
     st.session_state.research_data = None
 
+if "is_running" not in st.session_state:
+    st.session_state.is_running = False
+
 
 def set_mode(mode_name: str):
     st.session_state.research_depth = mode_name
+
+
+def reset_investigation():
+    """Resets the state to start a clean new research query."""
+    st.session_state.research_data = None
+    st.session_state.is_running = False
 
 
 # ============================================================
@@ -1273,8 +1282,16 @@ st.html(
     """
 )
 
+# Bind text area to last investigated question if report exists, otherwise allow fresh input
+default_question_text = (
+    st.session_state.research_data["question"]
+    if st.session_state.research_data
+    else ""
+)
+
 question = st.text_area(
     "Research question",
+    value=default_question_text,
     placeholder=(
         "Ask a research question...\n\n"
         "Example: What are the major opportunities, risks and "
@@ -1282,6 +1299,7 @@ question = st.text_area(
     ),
     height=165,
     label_visibility="collapsed",
+    disabled=st.session_state.is_running,
 )
 
 
@@ -1446,16 +1464,34 @@ for col, (name, subtitle, description) in zip(
 
 
 # ============================================================
-# START
+# START / ACTIONS
 # ============================================================
 
 st.html("<div style='height:18px'></div>")
 
-start_research = st.button(
-    "◈   Start Intelligence Research",
-    type="primary",
-    use_container_width=True,
-)
+if st.session_state.research_data:
+    # If a report is actively shown, offer a 2-column layout: Run New vs Reset
+    col_run, col_reset = st.columns([3, 1])
+    with col_run:
+        start_research = st.button(
+            "◈   Re-run Investigation",
+            type="primary",
+            use_container_width=True,
+            disabled=st.session_state.is_running,
+        )
+    with col_reset:
+        st.button(
+            "↺   New Query",
+            use_container_width=True,
+            on_click=reset_investigation,
+        )
+else:
+    start_research = st.button(
+        "◈   Start Intelligence Research",
+        type="primary",
+        use_container_width=True,
+        disabled=st.session_state.is_running,
+    )
 
 
 # ============================================================
@@ -1651,8 +1687,12 @@ if start_research:
         """
     )
 
-    def update_workflow_status(message):
-
+    def update_workflow_status(event_or_message):
+        """
+        Accepts either a structured dictionary event:
+          {'step': 2, 'state': 'Gathering web data'}
+        OR standard text strings with intelligent keyword mapping.
+        """
         statuses = {
             1: ("Research Planner", "Planning"),
             2: ("Web Researcher", "Gathering evidence"),
@@ -1664,27 +1704,34 @@ if start_research:
         }
 
         active_agent = None
+        custom_state_label = None
 
-        for number, (agent_name, state) in statuses.items():
-            if agent_name.lower() in message.lower():
-                active_agent = number
-                break
+        # 1. Check for structured dict event from ResearchCrew
+        if isinstance(event_or_message, dict):
+            active_agent = event_or_message.get("step")
+            custom_state_label = event_or_message.get("state")
 
-        if "Collecting web evidence" in message:
-            active_agent = 2
-
-        elif "Collecting academic evidence" in message:
-            active_agent = 3
-
-        elif "Collecting industry evidence" in message:
-            active_agent = 4
+        # 2. String fallback with resilient keyword matching
+        elif isinstance(event_or_message, str):
+            msg_lower = event_or_message.lower()
+            keyword_map = [
+                (1, ["planner", "planning"]),
+                (2, ["web", "tavily", "scraping"]),
+                (3, ["academic", "scholar", "literature"]),
+                (4, ["industry", "market", "commercial"]),
+                (5, ["analyst", "analyzing", "evidence"]),
+                (6, ["fact", "checker", "verifying", "verification"]),
+                (7, ["synthesizer", "synthesizing", "report"]),
+            ]
+            for step_num, keywords in keyword_map:
+                if any(kw in msg_lower for kw in keywords):
+                    active_agent = step_num
+                    break
 
         rows = []
-
-        for number, (agent_name, state) in statuses.items():
-
+        for number, (agent_name, default_state) in statuses.items():
             if active_agent == number:
-                current_state = state
+                current_state = custom_state_label or default_state
             elif active_agent and number < active_agent:
                 current_state = "Completed"
             else:
@@ -1703,22 +1750,14 @@ if start_research:
         workflow_status.html(
             f"""
             <div class="status-panel">
-
                 <div class="status-header">
-
-                    <div class="status-title">
-                        Research Team
-                    </div>
-
+                    <div class="status-title">Research Team</div>
                     <div class="status-live">
                         <span class="live-dot"></span>
                         PROCESSING
                     </div>
-
                 </div>
-
                 {''.join(rows)}
-
             </div>
             """
         )
@@ -1727,6 +1766,9 @@ if start_research:
         "Agents are conducting the investigation...",
         expanded=False,
     )
+
+    # 1. Turn on the flag right before starting the run
+    st.session_state.is_running = True
 
     try:
         start_time = time.perf_counter()
@@ -1737,10 +1779,11 @@ if start_research:
         with progress:
 
             def status_callback(message):
-
                 update_workflow_status(message)
-
-                st.write(message)
+                if isinstance(message, dict):
+                    st.write(f"**Step {message.get('step')}:** {message.get('state', '')}")
+                else:
+                    st.write(message)
 
             result = research_crew.run(
                 question=question.strip(),
@@ -1766,6 +1809,114 @@ if start_research:
             "elapsed_time": elapsed_time,
             "date": timestamp_str,
         }
+
+        # Final UI state
+        workflow_status.html(
+            """
+            <div class="status-panel">
+
+                <div class="status-header">
+
+                    <div class="status-title">
+                        Research Team
+                    </div>
+
+                    <div class="status-live">
+                        <span class="live-dot"></span>
+                        COMPLETE
+                    </div>
+
+                </div>
+
+                <div class="agent-row">
+                    <div class="agent-number">01</div>
+                    <div class="agent-name">Research Planner</div>
+                    <div class="agent-state">Completed</div>
+                </div>
+
+                <div class="agent-row">
+                    <div class="agent-number">02</div>
+                    <div class="agent-name">Web Researcher</div>
+                    <div class="agent-state">Completed</div>
+                </div>
+
+                <div class="agent-row">
+                    <div class="agent-number">03</div>
+                    <div class="agent-name">Academic Researcher</div>
+                    <div class="agent-state">Completed</div>
+                </div>
+
+                <div class="agent-row">
+                    <div class="agent-number">04</div>
+                    <div class="agent-name">Industry Researcher</div>
+                    <div class="agent-state">Completed</div>
+                </div>
+
+                <div class="agent-row">
+                    <div class="agent-number">05</div>
+                    <div class="agent-name">Evidence Analyst</div>
+                    <div class="agent-state">Completed</div>
+                </div>
+
+                <div class="agent-row">
+                    <div class="agent-number">06</div>
+                    <div class="agent-name">Fact Checker</div>
+                    <div class="agent-state">Completed</div>
+                </div>
+
+                <div class="agent-row">
+                    <div class="agent-number">07</div>
+                    <div class="agent-name">Research Synthesizer</div>
+                    <div class="agent-state">Completed</div>
+                </div>
+
+            </div>
+            """
+        )
+
+        progress.update(
+            label="Research completed successfully",
+            state="complete",
+            expanded=False,
+        )
+
+    except Exception as exc:
+
+        progress.update(
+            label="Research could not be completed",
+            state="error",
+            expanded=False,
+        )
+
+        error_text = str(exc)
+
+        if (
+            "rate_limit" in error_text.lower()
+            or "ratelimit" in error_text.lower()
+            or "429" in error_text
+        ):
+
+            st.error(
+                "The research workflow reached the current "
+                "Groq token-per-minute limit."
+            )
+
+            st.info(
+                "Try Quick research after the current "
+                "rate-limit window resets."
+            )
+
+        else:
+
+            st.error(
+                "The research workflow could not be completed."
+            )
+
+        with st.expander("Technical details"):
+            st.code(error_text)
+
+    finally:
+        st.session_state.is_running = False
 
         # Final UI state
         workflow_status.html(
