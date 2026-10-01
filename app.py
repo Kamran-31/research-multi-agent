@@ -1988,7 +1988,7 @@ if start_research:
             expanded=False,
         )
 
-    except Exception as exc:
+     except Exception as exc:
 
         progress.update(
             label="Research could not be completed",
