@@ -1,5 +1,7 @@
-import os
 import html
+import os
+import time
+from datetime import datetime
 import streamlit as st
 
 from crew.research_crew import ResearchCrew
@@ -15,6 +17,21 @@ if "GROQ_API_KEY" in st.secrets:
 
 if "TAVILY_API_KEY" in st.secrets:
     os.environ["TAVILY_API_KEY"] = st.secrets["TAVILY_API_KEY"]
+
+
+# ============================================================
+# STATE INITIALIZATION
+# ============================================================
+
+if "research_depth" not in st.session_state:
+    st.session_state.research_depth = "Standard"
+
+if "research_data" not in st.session_state:
+    st.session_state.research_data = None
+
+
+def set_mode(mode_name: str):
+    st.session_state.research_depth = mode_name
 
 
 # ============================================================
@@ -978,7 +995,7 @@ st.html(
     }
 
     div[data-testid="stTextArea"] {
-    width: 100%;
+        width: 100%;
     }
 
     div[data-testid="stTextArea"] > div {
@@ -1049,19 +1066,10 @@ with st.sidebar:
         '<div class="sidebar-section">Research Configuration</div>'
     )
 
-    if "research_depth" not in st.session_state:
-        st.session_state.research_depth = "Standard"
-
-    if "selected_mode" in st.session_state:
-        st.session_state.research_depth = st.session_state.selected_mode
-        del st.session_state.selected_mode
-    
     research_depth = st.selectbox(
         "Research depth",
         ["Quick", "Standard", "Deep"],
-        index=["Quick", "Standard", "Deep"].index(
-            st.session_state.research_depth
-        ),
+        key="research_depth",
         label_visibility="collapsed",
     )
 
@@ -1071,7 +1079,7 @@ with st.sidebar:
         "Deep": "Broader evidence collection for complex questions.",
     }
 
-    st.caption(depth_info[research_depth])
+    st.caption(depth_info[st.session_state.research_depth])
 
     st.html(
         '<div class="sidebar-section">Research Sources</div>'
@@ -1322,7 +1330,7 @@ active_index = {
     "Quick": 1,
     "Standard": 2,
     "Deep": 3,
-}[research_depth]
+}[st.session_state.research_depth]
 
 st.html(
     f"""
@@ -1426,17 +1434,15 @@ for col, (name, subtitle, description) in zip(
 
     with col:
 
-        clicked = st.button(
+        st.button(
             f"**{name}**  \n"
             f"{subtitle}  \n"
             f"{description}",
             key=f"mode_{name.lower()}",
             use_container_width=True,
+            on_click=set_mode,
+            args=(name,),
         )
-
-        if clicked:
-            st.session_state.selected_mode = name
-            st.rerun()
 
 
 # ============================================================
@@ -1645,7 +1651,6 @@ if start_research:
         """
     )
 
-
     def update_workflow_status(message):
 
         statuses = {
@@ -1718,13 +1723,14 @@ if start_research:
             """
         )
 
-
     progress = st.status(
         "Agents are conducting the investigation...",
         expanded=False,
     )
 
     try:
+        start_time = time.perf_counter()
+        timestamp_str = datetime.now().strftime("%B %d, %Y · %H:%M")
 
         research_crew = ResearchCrew()
 
@@ -1738,9 +1744,28 @@ if start_research:
 
             result = research_crew.run(
                 question=question.strip(),
-                depth=research_depth,
+                depth=st.session_state.research_depth,
                 status_callback=status_callback,
             )
+
+        elapsed_time = round(time.perf_counter() - start_time, 2)
+        report = clean_markdown(str(result))
+        sources = extract_sources(report)
+
+        # Generate downloadable PDF report
+        pdf_file = create_pdf(
+            report_markdown=result,
+            question=question.strip(),
+        )
+
+        st.session_state.research_data = {
+            "question": question.strip(),
+            "report": report,
+            "sources": sources,
+            "pdf_bytes": pdf_file.getvalue(),
+            "elapsed_time": elapsed_time,
+            "date": timestamp_str,
+        }
 
         # Final UI state
         workflow_status.html(
@@ -1812,112 +1837,6 @@ if start_research:
             expanded=False,
         )
 
-        # ----------------------------------------------------
-        # REPORT
-        # ----------------------------------------------------
-
-        report = clean_markdown(str(result))
-
-        st.html(
-            """
-            <div class="section-label">
-                05 · Intelligence Report
-            </div>
-
-            <div class="report-shell">
-
-                <div class="report-header">
-
-                    <div class="report-header-title">
-
-                        <div class="report-mark">
-                            ✦
-                        </div>
-
-                        Research Intelligence Report
-
-                    </div>
-
-                    <div class="report-badge">
-                        COMPLETED
-                    </div>
-
-                </div>
-
-                <div class="report-content">
-            """
-        )
-
-        st.markdown(report)
-
-        st.html(
-            """
-                </div>
-            </div>
-            """
-        )
-
-        # Generate downloadable PDF report
-        pdf_file = create_pdf(
-            report_markdown=result,
-            question=question.strip(),
-        )
-
-        st.download_button(
-            label="Download PDF Report",
-            data=pdf_file.getvalue(),
-            file_name="Research Intelligence.pdf",
-            mime="application/pdf",
-            use_container_width=True,
-        )
-
-        # ----------------------------------------------------
-        # SOURCES
-        # ----------------------------------------------------
-
-        sources = extract_sources(report)
-
-        if sources:
-
-            st.html(
-                """
-                <div class="section-label">
-                    06 · Evidence Base
-                </div>
-
-                <div class="section-title">
-                    Research Sources
-                </div>
-                """
-            )
-
-            for source in sources:
-
-                title = html.escape(
-                    source.get("title", "Source")
-                )
-
-                url = html.escape(
-                    source.get("url", ""),
-                    quote=True,
-                )
-
-                st.html(
-                    f"""
-                    <div class="source-card">
-
-                        <div class="source-title">
-                            {title}
-                        </div>
-
-                        <div class="source-url">
-                            {url}
-                        </div>
-
-                    </div>
-                    """
-                )
-
     except Exception as exc:
 
         progress.update(
@@ -1952,6 +1871,124 @@ if start_research:
 
         with st.expander("Technical details"):
             st.code(error_text)
+
+
+# ============================================================
+# REPORT & SOURCES (PERSISTENT DISPLAY)
+# ============================================================
+
+if st.session_state.research_data:
+
+    data = st.session_state.research_data
+
+    st.html(
+        f"""
+        <div class="section-label">
+            05 · Intelligence Report
+        </div>
+
+        <div class="report-shell">
+
+            <div class="report-header">
+
+                <div>
+                    <div class="report-header-title">
+                        <div class="report-mark">
+                            ✦
+                        </div>
+                        Research Intelligence Report
+                    </div>
+                    <div style="font-size: 12px; color: #8794A7; margin-top: 6px; margin-left: 42px;">
+                        Investigated on: <strong style="color: #DCE4EE;">{data['date']}</strong>
+                        &nbsp;·&nbsp; Target: <em>"{html.escape(data['question'])}"</em>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <div style="
+                        padding: 7px 10px;
+                        border-radius: 7px;
+                        background: rgba(40,120,255,0.1);
+                        border: 1px solid rgba(40,120,255,0.25);
+                        color: #70A9FF;
+                        font-size: 11px;
+                        font-weight: 700;
+                    ">
+                        ⚡ {data['elapsed_time']}s
+                    </div>
+
+                    <div class="report-badge">
+                        COMPLETED
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="report-content">
+        """
+    )
+
+    st.markdown(data["report"])
+
+    st.html(
+        """
+            </div>
+        </div>
+        """
+    )
+
+    st.download_button(
+        label="Download PDF Report",
+        data=data["pdf_bytes"],
+        file_name="Research Intelligence.pdf",
+        mime="application/pdf",
+        use_container_width=True,
+    )
+
+    # ----------------------------------------------------
+    # SOURCES
+    # ----------------------------------------------------
+
+    if data["sources"]:
+
+        st.html(
+            """
+            <div class="section-label">
+                06 · Evidence Base
+            </div>
+
+            <div class="section-title">
+                Research Sources
+            </div>
+            """
+        )
+
+        for source in data["sources"]:
+
+            title = html.escape(
+                source.get("title", "Source")
+            )
+
+            url = html.escape(
+                source.get("url", ""),
+                quote=True,
+            )
+
+            st.html(
+                f"""
+                <div class="source-card">
+
+                    <div class="source-title">
+                        {title}
+                    </div>
+
+                    <div class="source-url">
+                        {url}
+                    </div>
+
+                </div>
+                """
+            )
 
 
 # ============================================================
